@@ -30,18 +30,21 @@ ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61
 
 # Модели базы данных
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  # Вот эту строку добавь
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    quizzes = db.relationship('Quiz', backref='creator', lazy=True)
-    quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True)
+
+    # Связи
+    quizzes = db.relationship('Quiz', backref='creator', lazy=True, foreign_keys='Quiz.user_id')
+    quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True, foreign_keys='QuizPlay.user_id')
 
 
 class Quiz(db.Model):
+    __tablename__ = 'quiz'
     id = db.Column(db.String(12), primary_key=True)
     code = db.Column(db.String(8), unique=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -49,33 +52,38 @@ class Quiz(db.Model):
     text_color = db.Column(db.String(7), default='#FFFFFF')
     button_color = db.Column(db.String(7), default='#A0A0A0')
     time_limit = db.Column(db.Integer, default=30)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     likes = db.Column(db.Integer, default=0)
     dislikes = db.Column(db.Integer, default=0)
+
+    # Связи
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
-    plays = db.relationship('QuizPlay', backref='quiz', lazy=True)
+    plays = db.relationship('QuizPlay', backref='quiz', lazy=True, foreign_keys='QuizPlay.quiz_id')
 
 
 class Question(db.Model):
+    __tablename__ = 'question'
     id = db.Column(db.Integer, primary_key=True)
     quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
     question_text = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Integer, nullable=False)
-    answers = db.Column(db.Text, nullable=False)  # JSON строка с ответами
+    answers = db.Column(db.Text, nullable=False)
 
 
 class QuizPlay(db.Model):
+    __tablename__ = 'quiz_play'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
     score = db.Column(db.Integer, default=0)
     played_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class LikeDislike(db.Model):
+    __tablename__ = 'like_dislike'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
     is_like = db.Column(db.Boolean, nullable=False)
 
