@@ -28,6 +28,18 @@ ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93c
 ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96'
 
 
+# Фильтр для парсинга JSON в шаблонах
+@app.template_filter('from_json')
+def from_json_filter(value):
+    """Фильтр для парсинга JSON в шаблонах"""
+    if value:
+        try:
+            return json.loads(value)
+        except:
+            return []
+    return []
+
+
 # Модели базы данных
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -267,8 +279,12 @@ def create_quiz():
                 if answer_text:
                     answers.append(answer_text)
 
-            if len(answers) < 2 or len(answers) > 10:
-                flash(f'Вопрос {i + 1} должен содержать от 2 до 10 ответов', 'error')
+            if len(answers) < 2:
+                flash(f'Вопрос {i + 1} должен содержать минимум 2 ответа', 'error')
+                return render_template('create_quiz.html')
+
+            if len(answers) > 10:
+                flash(f'Вопрос {i + 1} должен содержать максимум 10 ответов', 'error')
                 return render_template('create_quiz.html')
 
             question = Question(
@@ -332,7 +348,31 @@ def play_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
-    # Парсим JSON ответы
+    # Для обработки POST запроса (отправка ответов)
+    if request.method == 'POST':
+        total_questions = len(questions)
+        score = 0
+
+        for question in questions:
+            answer_key = f'question_{question.id}'
+            user_answer = request.form.get(answer_key)
+            if user_answer is not None:
+                if int(user_answer) == question.correct_answer:
+                    score += 1
+
+        # Сохраняем результат
+        quiz_play = QuizPlay(
+            user_id=current_user.id,
+            quiz_id=quiz_id,
+            score=score
+        )
+        db.session.add(quiz_play)
+        db.session.commit()
+
+        flash(f'Ваш результат: {score}/{total_questions}', 'success')
+        return redirect(url_for('quiz_list'))
+
+    # Для GET запроса подготавливаем вопросы с распарсенными ответами
     for question in questions:
         question.parsed_answers = json.loads(question.answers)
 
@@ -471,6 +511,10 @@ def edit_quiz(quiz_id):
                 if answer_text:
                     answers.append(answer_text)
 
+            if len(answers) < 2:
+                flash(f'Вопрос {i + 1} должен содержать минимум 2 ответа', 'error')
+                return redirect(url_for('edit_quiz', quiz_id=quiz_id))
+
             question = Question(
                 quiz_id=quiz_id,
                 question_text=question_text,
@@ -484,7 +528,16 @@ def edit_quiz(quiz_id):
         flash('Викторина обновлена!', 'success')
         return redirect(url_for('profile'))
 
-    return render_template('edit_quiz.html', quiz=quiz)
+    # Подготовка вопросов для отображения
+    questions_list = []
+    for question in quiz.questions:
+        questions_list.append({
+            'text': question.question_text,
+            'answers': json.loads(question.answers),
+            'correct': question.correct_answer
+        })
+
+    return render_template('edit_quiz.html', quiz=quiz, questions_list=questions_list)
 
 
 @app.route('/delete-quiz/<quiz_id>', methods=['POST'])
@@ -653,6 +706,7 @@ def save_result():
 
     return jsonify({'success': True})
 
+
 # Создание админа (выполняется один раз)
 def create_admin():
     with app.app_context():
@@ -669,9 +723,14 @@ def create_admin():
             )
             db.session.add(admin)
             db.session.commit()
-            print('Администратор создан! Логин: admin, Пароль: Admin123')
+            print('=' * 50)
+            print('Администратор создан!')
+            print('Логин: admin')
+            print('Пароль: Admin123')
             print('Секретное слово: кукуку')
             print('Код доступа: 12345678')
+            print('=' * 50)
+
 
 # Создание таблиц при запуске
 with app.app_context():
