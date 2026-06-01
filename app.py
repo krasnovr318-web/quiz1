@@ -12,23 +12,29 @@ import os
 
 app = Flask(__name__)
 
-# Конфигурация - поддержка PostgreSQL (Supabase)
+# Конфигурация
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Получаем DATABASE_URL из переменных окружения Render
-# Для Supabase URL должен начинаться с postgresql://
 database_url = os.environ.get('DATABASE_URL')
-if database_url and database_url.startswith('postgres://'):
-    # Render/Supabase могут использовать postgres://, но SQLAlchemy требует postgresql://
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+if database_url:
+    # Для Supabase и Render
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    # Добавляем параметры для стабильного соединения
+    if '?' in database_url:
+        database_url += '&sslmode=require'
+    else:
+        database_url += '?sslmode=require'
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///' + os.path.join(basedir, 'quiz.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Важно для PostgreSQL
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
     'pool_recycle': 300,
+    'pool_size': 5,
+    'max_overflow': 10
 }
 
 db = SQLAlchemy(app)
@@ -36,15 +42,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Конфигурация админ-доступа (хеши для секретного слова и кода)
+# Конфигурация админ-доступа
 ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93cfed9a71a32'
 ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96'
 
 
-# Фильтр для парсинга JSON в шаблонах
+# Фильтр для парсинга JSON
 @app.template_filter('from_json')
 def from_json_filter(value):
-    """Фильтр для парсинга JSON в шаблонах"""
     if value:
         try:
             return json.loads(value)
@@ -63,7 +68,6 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Связи
     quizzes = db.relationship('Quiz', backref='creator', lazy=True, foreign_keys='Quiz.user_id')
     quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True, foreign_keys='QuizPlay.user_id')
 
@@ -82,7 +86,6 @@ class Quiz(db.Model):
     likes = db.Column(db.Integer, default=0)
     dislikes = db.Column(db.Integer, default=0)
 
-    # Связи
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
     plays = db.relationship('QuizPlay', backref='quiz', lazy=True, foreign_keys='QuizPlay.quiz_id')
 
@@ -118,7 +121,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# Функции-помощники
 def generate_id(length=12):
     chars = string.ascii_letters + string.digits
     return ''.join(random.choice(chars) for _ in range(length))
@@ -135,21 +137,17 @@ def admin_required(f):
         if not current_user.is_authenticated:
             flash('Необходимо войти в систему', 'error')
             return redirect(url_for('login'))
-
         if not current_user.is_admin:
             flash('Доступ запрещен. Только для администраторов.', 'error')
             return redirect(url_for('dashboard'))
-
-        # Проверка, прошел ли админ двухфакторную проверку
         if not session.get('admin_verified'):
             return redirect(url_for('admin_verify'))
-
         return f(*args, **kwargs)
 
     return decorated_function
 
 
-# Маршруты аутентификации
+# Маршруты
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -168,7 +166,6 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        # Валидация пароля
         if len(password) < 8:
             flash('Пароль должен содержать не менее 8 символов', 'error')
             return render_template('register.html')
@@ -181,7 +178,6 @@ def register():
             flash('Пароли не совпадают', 'error')
             return render_template('register.html')
 
-        # Проверка существующего пользователя
         if User.query.filter_by(username=username).first():
             flash('Пользователь с таким именем уже существует', 'error')
             return render_template('register.html')
@@ -190,7 +186,6 @@ def register():
             flash('Пользователь с таким email уже существует', 'error')
             return render_template('register.html')
 
-        # Создание пользователя
         user = User(
             username=username,
             email=email,
@@ -253,7 +248,7 @@ def create_quiz():
         time_limit = int(request.form.get('time_limit', 30))
 
         if time_limit < 5 or time_limit > 3600:
-            flash('Время должно быть от 5 секунд до 3600 секунд (60 минут)', 'error')
+            flash('Время должно быть от 5 секунд до 3600 секунд', 'error')
             return render_template('create_quiz.html')
 
         quiz_id = generate_id()
@@ -288,10 +283,6 @@ def create_quiz():
 
             if len(answers) < 2:
                 flash(f'Вопрос {i + 1} должен содержать минимум 2 ответа', 'error')
-                return render_template('create_quiz.html')
-
-            if len(answers) > 10:
-                flash(f'Вопрос {i + 1} должен содержать максимум 10 ответов', 'error')
                 return render_template('create_quiz.html')
 
             question = Question(
@@ -453,15 +444,11 @@ def dislike_quiz(quiz_id):
 @login_required
 def profile():
     user = current_user
-
     total_likes = sum(quiz.likes for quiz in user.quizzes)
     total_dislikes = sum(quiz.dislikes for quiz in user.quizzes)
     quizzes_created = len(user.quizzes)
     quizzes_played = len(user.quiz_plays)
-
-    recent_plays = QuizPlay.query.filter_by(user_id=user.id) \
-        .order_by(QuizPlay.played_at.desc()).limit(5).all()
-
+    recent_plays = QuizPlay.query.filter_by(user_id=user.id).order_by(QuizPlay.played_at.desc()).limit(5).all()
     created_quizzes = Quiz.query.filter_by(user_id=user.id).all()
 
     return render_template('profile.html',
@@ -692,12 +679,11 @@ def save_result():
     return jsonify({'success': True})
 
 
-# Инициализация базы данных
+# Инициализация
 def init_db():
     with app.app_context():
         db.create_all()
 
-        # Создаем админа если его нет
         if not User.query.filter_by(username='admin').first():
             admin = User(
                 username='admin',
@@ -708,17 +694,14 @@ def init_db():
             db.session.add(admin)
             db.session.commit()
             print('=' * 50)
-            print('Администратор создан!')
-            print('Логин: admin')
-            print('Пароль: Admin123')
-            print('Секретное слово: кукуку')
-            print('Код доступа: 12345678')
+            print('Admin created! Login: admin, Password: Admin123')
+            print('Secret word: кукуку, Access code: 12345678')
             print('=' * 50)
 
+
+# Для gunicorn
+init_db()
 
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
-else:
-    # Для gunicorn (на Render)
-    init_db()
