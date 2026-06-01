@@ -2,28 +2,26 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import string
-from config import Config
 from functools import wraps
 import json
 import hashlib
+import os
 
 app = Flask(__name__)
-app.config.from_object(Config)
+
+# Конфигурация
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'quiz.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Добавь эти строки для отладки
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-db = SQLAlchemy(app)
 
 # Конфигурация админ-доступа (хеши для секретного слова и кода)
 ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93cfed9a71a32'
