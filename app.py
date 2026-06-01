@@ -657,12 +657,10 @@ def admin_reset_all():
 # Создание админа (выполняется один раз)
 def create_admin():
     with app.app_context():
-        # Проверяем, используем ли мы SQLite (локально) или PostgreSQL (продакшн)
-        is_sqlite = 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']
+        # Создаем все таблицы
+        db.create_all()
 
-        if is_sqlite:
-            db.create_all()
-
+        # Создаем админа если его нет
         if not User.query.filter_by(username='admin').first():
             admin = User(
                 username='admin',
@@ -676,6 +674,9 @@ def create_admin():
             print('Секретное слово: кукуку')
             print('Код доступа: 12345678')
 
+# Создание таблиц при запуске
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     create_admin()
