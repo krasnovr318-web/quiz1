@@ -657,6 +657,24 @@ def admin_reset_all():
     return redirect(url_for('admin_panel'))
 
 
+@app.route('/save-result', methods=['POST'])
+@login_required
+def save_result():
+    data = request.get_json()
+    quiz_id = data.get('quiz_id')
+    score = data.get('score')
+
+    quiz_play = QuizPlay(
+        user_id=current_user.id,
+        quiz_id=quiz_id,
+        score=score
+    )
+
+    db.session.add(quiz_play)
+    db.session.commit()
+
+    return jsonify({'success': True})
+
 # Создание админа (выполняется один раз)
 def create_admin():
     with app.app_context():
