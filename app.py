@@ -332,7 +332,6 @@ def play_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
     if request.method == 'POST':
-        # Обработка результатов
         score = 0
         questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
@@ -341,7 +340,6 @@ def play_quiz(quiz_id):
             if user_answer and int(user_answer) == question.correct_answer:
                 score += 1
 
-        # Сохранение результата
         quiz_play = QuizPlay(
             user_id=current_user.id,
             quiz_id=quiz_id,
@@ -356,7 +354,7 @@ def play_quiz(quiz_id):
 
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
-    # Парсим JSON ответы для каждого вопроса
+    # Парсим JSON ответы
     for question in questions:
         question.parsed_answers = json.loads(question.answers)
 
