@@ -330,28 +330,6 @@ def quiz_list():
 @login_required
 def play_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
-
-    if request.method == 'POST':
-        score = 0
-        questions = Question.query.filter_by(quiz_id=quiz_id).all()
-
-        for question in questions:
-            user_answer = request.form.get(f'question_{question.id}')
-            if user_answer and int(user_answer) == question.correct_answer:
-                score += 1
-
-        quiz_play = QuizPlay(
-            user_id=current_user.id,
-            quiz_id=quiz_id,
-            score=score
-        )
-
-        db.session.add(quiz_play)
-        db.session.commit()
-
-        flash(f'Викторина пройдена! Ваш результат: {score}/{len(questions)}', 'success')
-        return redirect(url_for('profile'))
-
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
     # Парсим JSON ответы
