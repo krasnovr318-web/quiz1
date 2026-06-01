@@ -355,6 +355,11 @@ def play_quiz(quiz_id):
         return redirect(url_for('profile'))
 
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
+
+    # Парсим JSON ответы для каждого вопроса
+    for question in questions:
+        question.parsed_answers = json.loads(question.answers)
+
     return render_template('play_quiz.html', quiz=quiz, questions=questions)
 
 
