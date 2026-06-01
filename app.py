@@ -12,12 +12,13 @@ import os
 
 app = Flask(__name__)
 
-# Конфигурация - SQLite для простоты
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'quiz.db')
+# Подключение к Supabase через переменную окружения DATABASE_URL
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -30,7 +31,6 @@ ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93c
 ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96'
 
 
-# Фильтр для парсинга JSON
 @app.template_filter('from_json')
 def from_json_filter(value):
     if value:
@@ -41,7 +41,6 @@ def from_json_filter(value):
     return []
 
 
-# Модели
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
