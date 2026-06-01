@@ -61,8 +61,7 @@
             <div class="question-slide" id="question_{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
                 <h3 class="text-center mb-4">{{ question.question_text }}</h3>
                 <div class="row">
-                    {% set answers_list = question.answers|from_json %}
-                    {% for answer in answers_list %}
+                    {% for answer in question.parsed_answers %}
                         <div class="col-12 mb-3">
                             <button class="answer-btn"
                                     onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
@@ -117,7 +116,6 @@ function startTimer() {
     timerInterval = setInterval(() => {
         timeLeft--;
         updateTimer();
-
         if (timeLeft <= 0 && !answered && currentQuestion < totalQuestions) {
             clearInterval(timerInterval);
             nextQuestion();
@@ -214,7 +212,6 @@ function dislikeQuiz() {
         });
 }
 
-// Старт викторины
 startTimer();
 </script>
 {% endblock %}

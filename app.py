@@ -12,36 +12,13 @@ import os
 
 app = Flask(__name__)
 
-# === КОНФИГУРАЦИЯ ДЛЯ SUPABASE ===
-# Получаем DATABASE_URL из переменных окружения Render
-database_url = os.environ.get('DATABASE_URL')
-
-if database_url:
-    # Конвертируем postgres:// в postgresql:// для SQLAlchemy
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-    # Добавляем sslmode=require для безопасности
-    if 'sslmode' not in database_url:
-        if '?' in database_url:
-            database_url += '&sslmode=require'
-        else:
-            database_url += '?sslmode=require'
-else:
-    # Fallback на SQLite для локальной разработки
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    database_url = f'sqlite:///{os.path.join(basedir, "quiz.db")}'
+# Конфигурация - SQLite для простоты
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'quiz.db')
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Настройки для стабильного соединения с Supabase
-# Это предотвращает ошибки "server closed the connection"
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'pool_pre_ping': True,  # Проверяет соединение перед использованием
-    'pool_recycle': 300,  # Пересоздает соединение каждые 5 минут
-}
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -53,6 +30,7 @@ ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93c
 ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96'
 
 
+# Фильтр для парсинга JSON
 @app.template_filter('from_json')
 def from_json_filter(value):
     if value:
@@ -63,7 +41,7 @@ def from_json_filter(value):
     return []
 
 
-# Модели (те же самые)
+# Модели
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -72,6 +50,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     quizzes = db.relationship('Quiz', backref='creator', lazy=True)
     quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True)
 
@@ -89,6 +68,7 @@ class Quiz(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     likes = db.Column(db.Integer, default=0)
     dislikes = db.Column(db.Integer, default=0)
+
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
     plays = db.relationship('QuizPlay', backref='quiz', lazy=True)
 
@@ -125,21 +105,23 @@ def load_user(user_id):
 
 
 def generate_id(length=12):
-    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
 
 
 def generate_code(length=8):
-    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
 
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            flash('Необходимо войти', 'error')
+            flash('Необходимо войти в систему', 'error')
             return redirect(url_for('login'))
         if not current_user.is_admin:
-            flash('Доступ запрещен', 'error')
+            flash('Доступ запрещен. Только для администраторов.', 'error')
             return redirect(url_for('dashboard'))
         if not session.get('admin_verified'):
             return redirect(url_for('admin_verify'))
@@ -148,7 +130,6 @@ def admin_required(f):
     return decorated_function
 
 
-# Маршруты
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -168,7 +149,7 @@ def register():
         confirm_password = request.form.get('confirm_password')
 
         if len(password) < 8:
-            flash('Пароль должен быть не менее 8 символов', 'error')
+            flash('Пароль должен содержать не менее 8 символов', 'error')
             return render_template('register.html')
 
         if not any(c.isalpha() for c in password) or not any(c.isdigit() for c in password):
@@ -180,11 +161,11 @@ def register():
             return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
-            flash('Пользователь уже существует', 'error')
+            flash('Пользователь с таким именем уже существует', 'error')
             return render_template('register.html')
 
         if User.query.filter_by(email=email).first():
-            flash('Email уже используется', 'error')
+            flash('Пользователь с таким email уже существует', 'error')
             return render_template('register.html')
 
         user = User(
@@ -196,7 +177,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash('Регистрация успешна!', 'success')
+        flash('Регистрация успешна! Теперь вы можете войти.', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -210,14 +191,15 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            flash('Добро пожаловать!', 'success')
+            flash('Успешный вход!', 'success')
             return redirect(url_for('dashboard'))
         else:
-            flash('Неверные данные', 'error')
+            flash('Неверное имя пользователя или пароль', 'error')
 
     return render_template('login.html')
 
@@ -227,7 +209,7 @@ def login():
 def logout():
     session.pop('admin_verified', None)
     logout_user()
-    flash('Вы вышли', 'info')
+    flash('Вы вышли из системы', 'info')
     return redirect(url_for('index'))
 
 
@@ -247,6 +229,10 @@ def create_quiz():
         button_color = request.form.get('button_color', '#A0A0A0')
         time_limit = int(request.form.get('time_limit', 30))
 
+        if time_limit < 5 or time_limit > 3600:
+            flash('Время должно быть от 5 секунд до 3600 секунд', 'error')
+            return render_template('create_quiz.html')
+
         quiz_id = generate_id()
         quiz_code = generate_code()
 
@@ -260,6 +246,7 @@ def create_quiz():
             time_limit=time_limit,
             user_id=current_user.id
         )
+
         db.session.add(quiz)
 
         question_count = int(request.form.get('question_count', 1))
@@ -276,16 +263,22 @@ def create_quiz():
                 if answer_text:
                     answers.append(answer_text)
 
+            if len(answers) < 2:
+                flash(f'Вопрос {i + 1} должен содержать минимум 2 ответа', 'error')
+                return render_template('create_quiz.html')
+
             question = Question(
                 quiz_id=quiz_id,
                 question_text=question_text,
                 correct_answer=correct_answer,
                 answers=json.dumps(answers)
             )
+
             db.session.add(question)
 
         db.session.commit()
-        flash(f'Викторина создана! Код: {quiz_code}', 'success')
+
+        flash(f'Викторина создана! Код для входа: {quiz_code}', 'success')
         return redirect(url_for('dashboard'))
 
     return render_template('create_quiz.html')
@@ -299,12 +292,33 @@ def join_quiz():
         quiz = Quiz.query.filter_by(code=code).first()
 
         if not quiz:
-            flash('Викторина не найдена', 'error')
+            flash('Викторина с таким кодом не найдена', 'error')
             return render_template('join_quiz.html')
 
         return redirect(url_for('play_quiz', quiz_id=quiz.id))
 
     return render_template('join_quiz.html')
+
+
+@app.route('/quiz-list')
+@login_required
+def quiz_list():
+    search = request.args.get('search', '')
+    sort = request.args.get('sort', 'popular')
+
+    if search:
+        quizzes = Quiz.query.filter(
+            (Quiz.title.contains(search)) | (Quiz.id.contains(search))
+        ).all()
+    else:
+        quizzes = Quiz.query.all()
+
+    if sort == 'popular':
+        quizzes = sorted(quizzes, key=lambda q: q.likes, reverse=True)
+    elif sort == 'recent':
+        quizzes = sorted(quizzes, key=lambda q: q.created_at, reverse=True)
+
+    return render_template('quiz_list.html', quizzes=quizzes)
 
 
 @app.route('/play-quiz/<quiz_id>', methods=['GET', 'POST'])
@@ -314,11 +328,15 @@ def play_quiz(quiz_id):
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
     if request.method == 'POST':
+        total_questions = len(questions)
         score = 0
+
         for question in questions:
-            user_answer = request.form.get(f'question_{question.id}')
-            if user_answer and int(user_answer) == question.correct_answer:
-                score += 1
+            answer_key = f'question_{question.id}'
+            user_answer = request.form.get(answer_key)
+            if user_answer is not None:
+                if int(user_answer) == question.correct_answer:
+                    score += 1
 
         quiz_play = QuizPlay(
             user_id=current_user.id,
@@ -328,8 +346,8 @@ def play_quiz(quiz_id):
         db.session.add(quiz_play)
         db.session.commit()
 
-        flash(f'Результат: {score}/{len(questions)}', 'success')
-        return redirect(url_for('dashboard'))
+        flash(f'Ваш результат: {score}/{total_questions}', 'success')
+        return redirect(url_for('quiz_list'))
 
     for question in questions:
         question.parsed_answers = json.loads(question.answers)
@@ -341,7 +359,11 @@ def play_quiz(quiz_id):
 @login_required
 def like_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
-    existing = LikeDislike.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
+
+    existing = LikeDislike.query.filter_by(
+        user_id=current_user.id,
+        quiz_id=quiz_id
+    ).first()
 
     if existing:
         if existing.is_like:
@@ -352,7 +374,11 @@ def like_quiz(quiz_id):
             quiz.likes += 1
             quiz.dislikes -= 1
     else:
-        like = LikeDislike(user_id=current_user.id, quiz_id=quiz_id, is_like=True)
+        like = LikeDislike(
+            user_id=current_user.id,
+            quiz_id=quiz_id,
+            is_like=True
+        )
         db.session.add(like)
         quiz.likes += 1
 
@@ -364,7 +390,11 @@ def like_quiz(quiz_id):
 @login_required
 def dislike_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
-    existing = LikeDislike.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
+
+    existing = LikeDislike.query.filter_by(
+        user_id=current_user.id,
+        quiz_id=quiz_id
+    ).first()
 
     if existing:
         if not existing.is_like:
@@ -375,8 +405,12 @@ def dislike_quiz(quiz_id):
             quiz.likes -= 1
             quiz.dislikes += 1
     else:
-        dislike = LikeDislike(user_id=current_user.id, quiz_id=quiz_id, is_like=False)
-        db.session.add(dislike)
+        like = LikeDislike(
+            user_id=current_user.id,
+            quiz_id=quiz_id,
+            is_like=False
+        )
+        db.session.add(like)
         quiz.dislikes += 1
 
     db.session.commit()
@@ -387,8 +421,10 @@ def dislike_quiz(quiz_id):
 @login_required
 def profile():
     user = current_user
-    total_likes = sum(q.likes for q in user.quizzes)
-    total_dislikes = sum(q.dislikes for q in user.quizzes)
+    total_likes = sum(quiz.likes for quiz in user.quizzes)
+    total_dislikes = sum(quiz.dislikes for quiz in user.quizzes)
+    quizzes_created = len(user.quizzes)
+    quizzes_played = len(user.quiz_plays)
     recent_plays = QuizPlay.query.filter_by(user_id=user.id).order_by(QuizPlay.played_at.desc()).limit(5).all()
     created_quizzes = Quiz.query.filter_by(user_id=user.id).all()
 
@@ -396,8 +432,8 @@ def profile():
                            user=user,
                            total_likes=total_likes,
                            total_dislikes=total_dislikes,
-                           quizzes_created=len(user.quizzes),
-                           quizzes_played=len(user.quiz_plays),
+                           quizzes_created=quizzes_created,
+                           quizzes_played=quizzes_played,
                            recent_plays=recent_plays,
                            created_quizzes=created_quizzes)
 
@@ -408,7 +444,7 @@ def edit_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
     if quiz.user_id != current_user.id and not current_user.is_admin:
-        flash('Нет прав', 'error')
+        flash('У вас нет прав на редактирование этой викторины', 'error')
         return redirect(url_for('profile'))
 
     if request.method == 'POST':
@@ -434,12 +470,17 @@ def edit_quiz(quiz_id):
                 if answer_text:
                     answers.append(answer_text)
 
+            if len(answers) < 2:
+                flash(f'Вопрос {i + 1} должен содержать минимум 2 ответа', 'error')
+                return redirect(url_for('edit_quiz', quiz_id=quiz_id))
+
             question = Question(
                 quiz_id=quiz_id,
                 question_text=question_text,
                 correct_answer=correct_answer,
                 answers=json.dumps(answers)
             )
+
             db.session.add(question)
 
         db.session.commit()
@@ -455,12 +496,13 @@ def delete_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
     if quiz.user_id != current_user.id and not current_user.is_admin:
-        flash('Нет прав', 'error')
+        flash('У вас нет прав на удаление этой викторины', 'error')
         return redirect(url_for('profile'))
 
     db.session.delete(quiz)
     db.session.commit()
-    flash('Викторина удалена', 'success')
+
+    flash('Викторина удалена!', 'success')
     return redirect(url_for('profile'))
 
 
@@ -485,7 +527,7 @@ def delete_account():
 
     session.pop('admin_verified', None)
     logout_user()
-    flash('Аккаунт удален', 'info')
+    flash('Аккаунт успешно удален', 'info')
     return redirect(url_for('index'))
 
 
@@ -500,13 +542,15 @@ def admin_verify():
         secret_word = request.form.get('secret_word')
         access_code = request.form.get('access_code')
 
-        if hashlib.sha256(secret_word.encode()).hexdigest() == ADMIN_SECRET_WORD_HASH and \
-                hashlib.sha256(access_code.encode()).hexdigest() == ADMIN_ACCESS_CODE_HASH:
+        secret_hash = hashlib.sha256(secret_word.encode()).hexdigest()
+        code_hash = hashlib.sha256(access_code.encode()).hexdigest()
+
+        if secret_hash == ADMIN_SECRET_WORD_HASH and code_hash == ADMIN_ACCESS_CODE_HASH:
             session['admin_verified'] = True
-            flash('Доступ разрешен', 'success')
+            flash('Доступ к админ-панели разрешен', 'success')
             return redirect(url_for('admin_panel'))
         else:
-            flash('Неверные данные', 'error')
+            flash('Неверное секретное слово или код доступа', 'error')
 
     return render_template('admin_verify.html')
 
@@ -515,7 +559,7 @@ def admin_verify():
 @login_required
 def admin_logout():
     session.pop('admin_verified', None)
-    flash('Выход из админки', 'info')
+    flash('Вы вышли из админ-панели', 'info')
     return redirect(url_for('dashboard'))
 
 
@@ -533,16 +577,20 @@ def admin_panel():
 @admin_required
 def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
+
     if user.is_admin:
-        flash('Нельзя удалить админа', 'error')
+        flash('Нельзя удалить администратора', 'error')
         return redirect(url_for('admin_panel'))
 
     LikeDislike.query.filter_by(user_id=user.id).delete()
     QuizPlay.query.filter_by(user_id=user.id).delete()
+
     for quiz in user.quizzes:
         db.session.delete(quiz)
+
     db.session.delete(user)
     db.session.commit()
+
     flash(f'Пользователь {user.username} удален', 'success')
     return redirect(url_for('admin_panel'))
 
@@ -554,6 +602,7 @@ def admin_delete_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     db.session.delete(quiz)
     db.session.commit()
+
     flash(f'Викторина {quiz.title} удалена', 'success')
     return redirect(url_for('admin_panel'))
 
@@ -568,11 +617,13 @@ def admin_reset_all():
         Question.query.delete()
         Quiz.query.delete()
         User.query.filter_by(is_admin=False).delete()
+
         db.session.commit()
-        flash('Все данные сброшены', 'success')
+        flash('Все данные успешно сброшены', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Ошибка: {str(e)}', 'error')
+        flash(f'Ошибка при сбросе данных: {str(e)}', 'error')
+
     return redirect(url_for('admin_panel'))
 
 
@@ -580,17 +631,21 @@ def admin_reset_all():
 @login_required
 def save_result():
     data = request.get_json()
+    quiz_id = data.get('quiz_id')
+    score = data.get('score')
+
     quiz_play = QuizPlay(
         user_id=current_user.id,
-        quiz_id=data.get('quiz_id'),
-        score=data.get('score')
+        quiz_id=quiz_id,
+        score=score
     )
+
     db.session.add(quiz_play)
     db.session.commit()
+
     return jsonify({'success': True})
 
 
-# Инициализация
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username='admin').first():
@@ -603,8 +658,8 @@ with app.app_context():
         db.session.add(admin)
         db.session.commit()
         print('=' * 50)
-        print('Admin: admin / Admin123')
-        print('Secret word: кукуку, Code: 12345678')
+        print('Admin created! Login: admin, Password: Admin123')
+        print('Secret word: кукуку, Access code: 12345678')
         print('=' * 50)
 
 if __name__ == '__main__':
