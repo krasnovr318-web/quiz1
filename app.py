@@ -17,8 +17,8 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 # Конфигурация админ-доступа (хеши для секретного слова и кода)
-ADMIN_SECRET_WORD_HASH = cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93cfed9a71a32
-ADMIN_ACCESS_CODE_HASH = 4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96
+ADMIN_SECRET_WORD_HASH = 'cc4b8580b1c214cc3c3e204acc2c8ff62739baab0f981b84fee93cfed9a71a32'
+ADMIN_ACCESS_CODE_HASH = '4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b3959c1a96''
 
 
 # Модели базы данных
