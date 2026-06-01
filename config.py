@@ -7,10 +7,12 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-    # Используем DATABASE_URL из переменных окружения
     database_url = os.environ.get('DATABASE_URL')
-    if database_url and database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    # Если используем Supabase (postgres), добавляем sslmode
+    if database_url and 'postgres' in database_url:
+        if 'sslmode' not in database_url:
+            database_url += '?sslmode=require'
 
     SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:///quiz.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
