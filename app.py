@@ -23,6 +23,7 @@ ADMIN_ACCESS_CODE_HASH = 4cbc94725af76cc0347cd3ed31524a937d4182f3c83641d7d67d61b
 
 # Модели базы данных
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'  # Вот эту строку добавь
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -641,7 +642,11 @@ def admin_reset_all():
 # Создание админа (выполняется один раз)
 def create_admin():
     with app.app_context():
-        db.create_all()
+        # Проверяем, используем ли мы SQLite (локально) или PostgreSQL (продакшн)
+        is_sqlite = 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']
+
+        if is_sqlite:
+            db.create_all()
 
         if not User.query.filter_by(username='admin').first():
             admin = User(
@@ -653,7 +658,6 @@ def create_admin():
             db.session.add(admin)
             db.session.commit()
             print('Администратор создан! Логин: admin, Пароль: Admin123')
-            print('Для доступа к админ-панели используйте:')
             print('Секретное слово: кукуку')
             print('Код доступа: 12345678')
 
