@@ -8,7 +8,7 @@
         <h2 class="text-warning mb-4">Админ-панель</h2>
 
         <div class="alert alert-warning">
-            <strong>Внимание!</strong> Вы находитесь в панели администратора. Будьте осторожны с действиями.
+            <strong>Внимание!</strong> Вы находитесь в панели администратора.
         </div>
 
         <!-- Управление пользователями -->
@@ -29,30 +29,30 @@
                         </thead>
                         <tbody>
                             {% for user in users %}
-                                <tr>
-                                    <td>{{ user.id }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.quizzes|length }}</td>
-                                    <td>
-                                        {% if user.is_admin %}
-                                            <span class="badge bg-warning">Админ</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Пользователь</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if not user.is_admin %}
-                                            <form action="{{ url_for('admin_delete_user', user_id=user.id) }}"
-                                                  method="POST" style="display: inline;"
-                                                  onsubmit="return confirm('Удалить пользователя {{ user.username }}?');">
-                                                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                                            </form>
-                                        {% else %}
-                                            <button class="btn btn-secondary btn-sm" disabled>Нельзя удалить</button>
-                                        {% endif %}
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.quizzes|length }}</td>
+                                <td>
+                                    {% if user.is_admin %}
+                                        <span class="badge bg-warning">Админ</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Пользователь</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not user.is_admin %}
+                                    <form action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+                                          method="POST" style="display: inline;"
+                                          onsubmit="return confirm('Удалить пользователя {{ user.username }}?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                    </form>
+                                    {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>Админ</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -78,20 +78,20 @@
                         </thead>
                         <tbody>
                             {% for quiz in quizzes %}
-                                <tr>
-                                    <td><small>{{ quiz.id[:8] }}...</small></td>
-                                    <td>{{ quiz.title }}</td>
-                                    <td>{{ quiz.creator.username }}</td>
-                                    <td>{{ quiz.questions|length }}</td>
-                                    <td>👍 {{ quiz.likes }} | 👎 {{ quiz.dislikes }}</td>
-                                    <td>
-                                        <form action="{{ url_for('admin_delete_quiz', quiz_id=quiz.id) }}"
-                                              method="POST" style="display: inline;"
-                                              onsubmit="return confirm('Удалить викторину {{ quiz.title }}?');">
-                                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td><small>{{ quiz.id[:8] }}...</small></td>
+                                <td>{{ quiz.title }}</td>
+                                <td>{{ quiz.creator.username }}</td>
+                                <td>{{ quiz.questions|length }}</td>
+                                <td>👍 {{ quiz.likes }} | 👎 {{ quiz.dislikes }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_delete_quiz', quiz_id=quiz.id) }}"
+                                          method="POST" style="display: inline;"
+                                          onsubmit="return confirm('Удалить викторину {{ quiz.title }}?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -103,9 +103,9 @@
         <div class="card bg-danger mb-4">
             <div class="card-body">
                 <h4 class="text-light mb-3">Опасная зона</h4>
-                <p class="text-light">Эта кнопка удалит все данные всех пользователей. Это действие необратимо!</p>
+                <p class="text-light">Эта кнопка удалит все данные. Действие необратимо!</p>
                 <form action="{{ url_for('admin_reset_all') }}" method="POST"
-                      onsubmit="return confirm('ВЫ УВЕРЕНЫ? Это удалит ВСЕ данные всех пользователей!');">
+                      onsubmit="return confirm('ВЫ УВЕРЕНЫ? Это удалит ВСЕ данные!');">
                     <button type="submit" class="btn btn-dark">Перезапустить все данные</button>
                 </form>
             </div>

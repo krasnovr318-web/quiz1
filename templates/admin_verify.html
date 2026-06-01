@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Вход в админ-панель{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card bg-secondary">
+            <div class="card-body">
+                <h2 class="card-title text-center text-light mb-4">Вход в админ-панель</h2>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Внимание!</strong> Требуется двухфакторная аутентификация.
+                </div>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="secret_word" class="form-label text-light">Секретное слово</label>
+                        <input type="password" class="form-control bg-dark text-light border-secondary"
+                               id="secret_word" name="secret_word" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="access_code" class="form-label text-light">Код доступа</label>
+                        <input type="password" class="form-control bg-dark text-light border-secondary"
+                               id="access_code" name="access_code" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark">Войти в админ-панель</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="text-light">Вернуться в главное меню</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
