@@ -18,6 +18,10 @@
         opacity: 0.8;
         color: {{ quiz.text_color }};
     }
+    .form-check-input:checked {
+        background-color: {{ quiz.button_color }};
+        border-color: {{ quiz.text_color }};
+    }
 </style>
 
 <div class="quiz-container rounded p-4">
@@ -33,8 +37,7 @@
                 <div class="card-body">
                     <h5 class="card-title mb-3">Вопрос {{ loop.index }}: {{ question.question_text }}</h5>
 
-                    {% set answers = question.answers|tojson %}
-                    {% for answer in answers %}
+                    {% for answer in question.answers|fromjson %}
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio"
                                    name="question_{{ question.id }}"
@@ -49,7 +52,7 @@
             </div>
         {% endfor %}
 
-        <div class="text-center">
+        <div class="text-center mt-4">
             <button type="submit" class="btn btn-quiz btn-lg">Завершить викторину</button>
         </div>
     </form>
