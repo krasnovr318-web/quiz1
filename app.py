@@ -12,11 +12,24 @@ import os
 
 app = Flask(__name__)
 
-# Конфигурация
+# Конфигурация - поддержка PostgreSQL (Supabase)
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Получаем DATABASE_URL из переменных окружения Render
+# Для Supabase URL должен начинаться с postgresql://
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    # Render/Supabase могут использовать postgres://, но SQLAlchemy требует postgresql://
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'quiz.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///' + os.path.join(basedir, 'quiz.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Важно для PostgreSQL
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -217,14 +230,12 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    # Очищаем сессию админа при выходе
     session.pop('admin_verified', None)
     logout_user()
     flash('Вы вышли из системы', 'info')
     return redirect(url_for('index'))
 
 
-# Основные маршруты
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -241,12 +252,10 @@ def create_quiz():
         button_color = request.form.get('button_color', '#A0A0A0')
         time_limit = int(request.form.get('time_limit', 30))
 
-        # Валидация времени
         if time_limit < 5 or time_limit > 3600:
             flash('Время должно быть от 5 секунд до 3600 секунд (60 минут)', 'error')
             return render_template('create_quiz.html')
 
-        # Создание викторины
         quiz_id = generate_id()
         quiz_code = generate_code()
 
@@ -263,14 +272,12 @@ def create_quiz():
 
         db.session.add(quiz)
 
-        # Обработка вопросов
         question_count = int(request.form.get('question_count', 1))
 
         for i in range(question_count):
             question_text = request.form.get(f'question_{i}')
             correct_answer = int(request.form.get(f'correct_answer_{i}', 0))
 
-            # Получение ответов
             answers = []
             answer_count = int(request.form.get(f'answer_count_{i}', 2))
 
@@ -309,7 +316,6 @@ def create_quiz():
 def join_quiz():
     if request.method == 'POST':
         code = request.form.get('code')
-
         quiz = Quiz.query.filter_by(code=code).first()
 
         if not quiz:
@@ -324,22 +330,27 @@ def join_quiz():
 @app.route('/quiz-list')
 @login_required
 def quiz_list():
-    search = request.args.get('search', '')
-    sort = request.args.get('sort', 'popular')
+    try:
+        search = request.args.get('search', '')
+        sort = request.args.get('sort', 'popular')
 
-    if search:
-        quizzes = Quiz.query.filter(
-            (Quiz.title.contains(search)) | (Quiz.id.contains(search))
-        ).all()
-    else:
-        quizzes = Quiz.query.all()
+        if search:
+            quizzes = Quiz.query.filter(
+                (Quiz.title.contains(search)) | (Quiz.id.contains(search))
+            ).all()
+        else:
+            quizzes = Quiz.query.all()
 
-    if sort == 'popular':
-        quizzes = sorted(quizzes, key=lambda q: q.likes, reverse=True)
-    elif sort == 'recent':
-        quizzes = sorted(quizzes, key=lambda q: q.created_at, reverse=True)
+        if sort == 'popular':
+            quizzes = sorted(quizzes, key=lambda q: q.likes, reverse=True)
+        elif sort == 'recent':
+            quizzes = sorted(quizzes, key=lambda q: q.created_at, reverse=True)
 
-    return render_template('quiz_list.html', quizzes=quizzes)
+        return render_template('quiz_list.html', quizzes=quizzes)
+    except Exception as e:
+        app.logger.error(f"Error in quiz_list: {str(e)}")
+        flash('Ошибка загрузки списка викторин', 'error')
+        return render_template('quiz_list.html', quizzes=[])
 
 
 @app.route('/play-quiz/<quiz_id>', methods=['GET', 'POST'])
@@ -348,7 +359,6 @@ def play_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
-    # Для обработки POST запроса (отправка ответов)
     if request.method == 'POST':
         total_questions = len(questions)
         score = 0
@@ -360,7 +370,6 @@ def play_quiz(quiz_id):
                 if int(user_answer) == question.correct_answer:
                     score += 1
 
-        # Сохраняем результат
         quiz_play = QuizPlay(
             user_id=current_user.id,
             quiz_id=quiz_id,
@@ -372,7 +381,6 @@ def play_quiz(quiz_id):
         flash(f'Ваш результат: {score}/{total_questions}', 'success')
         return redirect(url_for('quiz_list'))
 
-    # Для GET запроса подготавливаем вопросы с распарсенными ответами
     for question in questions:
         question.parsed_answers = json.loads(question.answers)
 
@@ -384,7 +392,6 @@ def play_quiz(quiz_id):
 def like_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    # Проверяем, не лайкал ли уже пользователь
     existing = LikeDislike.query.filter_by(
         user_id=current_user.id,
         quiz_id=quiz_id
@@ -392,16 +399,13 @@ def like_quiz(quiz_id):
 
     if existing:
         if existing.is_like:
-            # Убираем лайк
             db.session.delete(existing)
             quiz.likes -= 1
         else:
-            # Меняем дизлайк на лайк
             existing.is_like = True
             quiz.likes += 1
             quiz.dislikes -= 1
     else:
-        # Ставим лайк
         like = LikeDislike(
             user_id=current_user.id,
             quiz_id=quiz_id,
@@ -426,16 +430,13 @@ def dislike_quiz(quiz_id):
 
     if existing:
         if not existing.is_like:
-            # Убираем дизлайк
             db.session.delete(existing)
             quiz.dislikes -= 1
         else:
-            # Меняем лайк на дизлайк
             existing.is_like = False
             quiz.likes -= 1
             quiz.dislikes += 1
     else:
-        # Ставим дизлайк
         like = LikeDislike(
             user_id=current_user.id,
             quiz_id=quiz_id,
@@ -453,17 +454,14 @@ def dislike_quiz(quiz_id):
 def profile():
     user = current_user
 
-    # Статистика
     total_likes = sum(quiz.likes for quiz in user.quizzes)
     total_dislikes = sum(quiz.dislikes for quiz in user.quizzes)
     quizzes_created = len(user.quizzes)
     quizzes_played = len(user.quiz_plays)
 
-    # История последних 5 пройденных викторин
     recent_plays = QuizPlay.query.filter_by(user_id=user.id) \
         .order_by(QuizPlay.played_at.desc()).limit(5).all()
 
-    # Созданные викторины
     created_quizzes = Quiz.query.filter_by(user_id=user.id).all()
 
     return render_template('profile.html',
@@ -481,7 +479,6 @@ def profile():
 def edit_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    # Проверка прав
     if quiz.user_id != current_user.id and not current_user.is_admin:
         flash('У вас нет прав на редактирование этой викторины', 'error')
         return redirect(url_for('profile'))
@@ -493,10 +490,8 @@ def edit_quiz(quiz_id):
         quiz.button_color = request.form.get('button_color', quiz.button_color)
         quiz.time_limit = int(request.form.get('time_limit', quiz.time_limit))
 
-        # Удаление старых вопросов
         Question.query.filter_by(quiz_id=quiz_id).delete()
 
-        # Добавление новых вопросов
         question_count = int(request.form.get('question_count', 1))
 
         for i in range(question_count):
@@ -528,7 +523,6 @@ def edit_quiz(quiz_id):
         flash('Викторина обновлена!', 'success')
         return redirect(url_for('profile'))
 
-    # Подготовка вопросов для отображения
     questions_list = []
     for question in quiz.questions:
         questions_list.append({
@@ -545,7 +539,6 @@ def edit_quiz(quiz_id):
 def delete_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    # Проверка прав
     if quiz.user_id != current_user.id and not current_user.is_admin:
         flash('У вас нет прав на удаление этой викторины', 'error')
         return redirect(url_for('profile'))
@@ -568,25 +561,22 @@ def delete_account():
 
     user = User.query.get(current_user.id)
 
-    # Удаление всех связанных данных
     LikeDislike.query.filter_by(user_id=user.id).delete()
     QuizPlay.query.filter_by(user_id=user.id).delete()
 
-    # Удаление викторин пользователя
     for quiz in user.quizzes:
         db.session.delete(quiz)
 
     db.session.delete(user)
     db.session.commit()
 
-    # Очищаем сессию админа
     session.pop('admin_verified', None)
     logout_user()
     flash('Аккаунт успешно удален', 'info')
     return redirect(url_for('index'))
 
 
-# Админ-панель с двухфакторной защитой
+# Админ-панель
 @app.route('/admin/verify', methods=['GET', 'POST'])
 @login_required
 def admin_verify():
@@ -598,7 +588,6 @@ def admin_verify():
         secret_word = request.form.get('secret_word')
         access_code = request.form.get('access_code')
 
-        # Проверяем секретное слово и код доступа
         secret_hash = hashlib.sha256(secret_word.encode()).hexdigest()
         code_hash = hashlib.sha256(access_code.encode()).hexdigest()
 
@@ -639,7 +628,6 @@ def admin_delete_user(user_id):
         flash('Нельзя удалить администратора', 'error')
         return redirect(url_for('admin_panel'))
 
-    # Удаление связанных данных
     LikeDislike.query.filter_by(user_id=user.id).delete()
     QuizPlay.query.filter_by(user_id=user.id).delete()
 
@@ -670,13 +658,10 @@ def admin_delete_quiz(quiz_id):
 @admin_required
 def admin_reset_all():
     try:
-        # Удаление всех данных
         LikeDislike.query.delete()
         QuizPlay.query.delete()
         Question.query.delete()
         Quiz.query.delete()
-
-        # Удаление всех пользователей кроме админов
         User.query.filter_by(is_admin=False).delete()
 
         db.session.commit()
@@ -707,10 +692,9 @@ def save_result():
     return jsonify({'success': True})
 
 
-# Создание админа (выполняется один раз)
-def create_admin():
+# Инициализация базы данных
+def init_db():
     with app.app_context():
-        # Создаем все таблицы
         db.create_all()
 
         # Создаем админа если его нет
@@ -732,10 +716,9 @@ def create_admin():
             print('=' * 50)
 
 
-# Создание таблиц при запуске
-with app.app_context():
-    db.create_all()
-
 if __name__ == '__main__':
-    create_admin()
+    init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
+else:
+    # Для gunicorn (на Render)
+    init_db()
