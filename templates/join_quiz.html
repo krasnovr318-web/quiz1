@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Присоединиться к викторине{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card bg-secondary">
+            <div class="card-body">
+                <h2 class="card-title text-center text-light mb-4">Войти по коду</h2>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="code" class="form-label text-light">Код викторины</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary"
+                               id="code" name="code" placeholder="Введите 8-значный код"
+                               maxlength="8" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark">Найти викторину</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

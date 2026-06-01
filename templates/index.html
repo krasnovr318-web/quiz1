@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Master - Главная{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1 class="display-4 mb-4 text-light">Quiz Master</h1>
+        <p class="lead mb-5 text-secondary">Создавайте и проходите викторины</p>
+        <div class="d-grid gap-3">
+            <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">Войти</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg">Зарегистрироваться</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

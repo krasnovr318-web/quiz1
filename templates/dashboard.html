@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Главное меню{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-12 text-center mb-4">
+        <h1 class="text-light">Добро пожаловать, {{ current_user.username }}!</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title text-light">Создать викторину</h3>
+                <p class="card-text text-muted">Создайте свою уникальную викторину</p>
+                <a href="{{ url_for('create_quiz') }}" class="btn btn-dark">Перейти</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title text-light">Зайти по коду</h3>
+                <p class="card-text text-muted">Присоединитесь к викторине по коду</p>
+                <a href="{{ url_for('join_quiz') }}" class="btn btn-dark">Перейти</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title text-light">Список викторин</h3>
+                <p class="card-text text-muted">Просмотрите все доступные викторины</p>
+                <a href="{{ url_for('quiz_list') }}" class="btn btn-dark">Перейти</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title text-light">Мой профиль</h3>
+                <p class="card-text text-muted">Просмотрите статистику и историю</p>
+                <a href="{{ url_for('profile') }}" class="btn btn-dark">Перейти</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

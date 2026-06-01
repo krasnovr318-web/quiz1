@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card bg-secondary text-light">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Регистрация</h2>
+                <form method="POST" id="registerForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary"
+                               id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-light border-secondary"
+                               id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control bg-dark text-light border-secondary"
+                               id="password" name="password" required
+                               pattern="(?=.*[a-zA-Z])(?=.*\d).{8,}"
+                               title="Пароль должен содержать минимум 8 символов, включая буквы и цифры">
+                        <div class="form-text text-light">Минимум 8 символов, буквы и цифры</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Подтвердите пароль</label>
+                        <input type="password" class="form-control bg-dark text-light border-secondary"
+                               id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark">Зарегистрироваться</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="text-light">Уже есть аккаунт? Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Пароли не совпадают!');
+    }
+
+    if (password.length < 8) {
+        e.preventDefault();
+        alert('Пароль должен содержать минимум 8 символов!');
+    }
+
+    if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+        e.preventDefault();
+        alert('Пароль должен содержать буквы и цифры!');
+    }
+});
+</script>
+{% endblock %}

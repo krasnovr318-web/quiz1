@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Викторина: {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<style>
+    .quiz-container {
+        background-color: {{ quiz.theme_color }};
+        color: {{ quiz.text_color }};
+        min-height: 80vh;
+    }
+    .btn-quiz {
+        background-color: {{ quiz.button_color }};
+        color: {{ quiz.text_color }};
+        border: none;
+    }
+    .btn-quiz:hover {
+        opacity: 0.8;
+        color: {{ quiz.text_color }};
+    }
+</style>
+
+<div class="quiz-container rounded p-4">
+    <h2 class="text-center mb-4">{{ quiz.title }}</h2>
+
+    <div class="text-center mb-4">
+        <h4>Время: <span id="timer">{{ quiz.time_limit }}</span> сек</h4>
+    </div>
+
+    <form method="POST" id="quizForm">
+        {% for question in questions %}
+            <div class="card bg-dark bg-opacity-25 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Вопрос {{ loop.index }}: {{ question.question_text }}</h5>
+
+                    {% set answers = question.answers|tojson %}
+                    {% for answer in answers %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio"
+                                   name="question_{{ question.id }}"
+                                   id="q{{ question.id }}_{{ loop.index0 }}"
+                                   value="{{ loop.index0 }}" required>
+                            <label class="form-check-label" for="q{{ question.id }}_{{ loop.index0 }}">
+                                {{ answer }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-quiz btn-lg">Завершить викторину</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let timeLeft = {{ quiz.time_limit }};
+const timerElement = document.getElementById('timer');
+const form = document.getElementById('quizForm');
+
+const timer = setInterval(() => {
+    timeLeft--;
+    timerElement.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        form.submit();
+    }
+}, 1000);
+
+form.addEventListener('submit', () => {
+    clearInterval(timer);
+});
+</script>
+{% endblock %}

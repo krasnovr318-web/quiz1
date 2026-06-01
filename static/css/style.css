@@ -1,0 +1,143 @@
+body {
+    background-color: #1a1a1a !important;
+    min-height: 100vh;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: 1px solid #404040;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn {
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.quiz-container {
+    border-radius: 15px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.form-control:focus {
+    border-color: #808080;
+    box-shadow: 0 0 0 0.2rem rgba(128,128,128,0.25);
+}
+
+.form-check-input:checked {
+    background-color: #808080;
+    border-color: #808080;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.modal-content {
+    border: 1px solid #606060;
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+.like-btn, .dislike-btn {
+    transition: all 0.3s;
+}
+
+.like-btn:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.dislike-btn:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+.timer {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.btn-quiz {
+    font-size: 1.2rem;
+    padding: 10px 30px;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .quiz-container {
+        padding: 15px !important;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
