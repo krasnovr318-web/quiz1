@@ -12,30 +12,18 @@ import os
 
 app = Flask(__name__)
 
-# Конфигурация
+# Конфигурация - используем SQLite
 basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'quiz.db')
 
-# Получаем DATABASE_URL из переменных окружения Render
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    # Для Supabase и Render
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    # Добавляем параметры для стабильного соединения
-    if '?' in database_url:
-        database_url += '&sslmode=require'
-    else:
-        database_url += '?sslmode=require'
+# Для Render - используем путь, где файлы сохраняются
+if os.environ.get('RENDER'):
+    db_path = '/opt/render/project/data/quiz.db'
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'K7m9pX2vL5nB8qR4wE1yU6iO3sA0dG9h')
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///' + os.path.join(basedir, 'quiz.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'pool_pre_ping': True,
-    'pool_recycle': 300,
-    'pool_size': 5,
-    'max_overflow': 10
-}
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -68,8 +56,8 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    quizzes = db.relationship('Quiz', backref='creator', lazy=True, foreign_keys='Quiz.user_id')
-    quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True, foreign_keys='QuizPlay.user_id')
+    quizzes = db.relationship('Quiz', backref='creator', lazy=True)
+    quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True)
 
 
 class Quiz(db.Model):
@@ -87,7 +75,7 @@ class Quiz(db.Model):
     dislikes = db.Column(db.Integer, default=0)
 
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
-    plays = db.relationship('QuizPlay', backref='quiz', lazy=True, foreign_keys='QuizPlay.quiz_id')
+    plays = db.relationship('QuizPlay', backref='quiz', lazy=True)
 
 
 class Question(db.Model):
@@ -325,12 +313,14 @@ def quiz_list():
         search = request.args.get('search', '')
         sort = request.args.get('sort', 'popular')
 
+        query = Quiz.query
+
         if search:
-            quizzes = Quiz.query.filter(
+            query = query.filter(
                 (Quiz.title.contains(search)) | (Quiz.id.contains(search))
-            ).all()
-        else:
-            quizzes = Quiz.query.all()
+            )
+
+        quizzes = query.all()
 
         if sort == 'popular':
             quizzes = sorted(quizzes, key=lambda q: q.likes, reverse=True)
@@ -340,7 +330,7 @@ def quiz_list():
         return render_template('quiz_list.html', quizzes=quizzes)
     except Exception as e:
         app.logger.error(f"Error in quiz_list: {str(e)}")
-        flash('Ошибка загрузки списка викторин', 'error')
+        flash(f'Ошибка загрузки списка викторин: {str(e)}', 'error')
         return render_template('quiz_list.html', quizzes=[])
 
 
@@ -510,15 +500,7 @@ def edit_quiz(quiz_id):
         flash('Викторина обновлена!', 'success')
         return redirect(url_for('profile'))
 
-    questions_list = []
-    for question in quiz.questions:
-        questions_list.append({
-            'text': question.question_text,
-            'answers': json.loads(question.answers),
-            'correct': question.correct_answer
-        })
-
-    return render_template('edit_quiz.html', quiz=quiz, questions_list=questions_list)
+    return render_template('edit_quiz.html', quiz=quiz)
 
 
 @app.route('/delete-quiz/<quiz_id>', methods=['POST'])
@@ -679,29 +661,23 @@ def save_result():
     return jsonify({'success': True})
 
 
-# Инициализация
-def init_db():
-    with app.app_context():
-        db.create_all()
+# Инициализация базы данных
+with app.app_context():
+    db.create_all()
 
-        if not User.query.filter_by(username='admin').first():
-            admin = User(
-                username='admin',
-                email='admin@quiz.com',
-                password_hash=generate_password_hash('Admin123'),
-                is_admin=True
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print('=' * 50)
-            print('Admin created! Login: admin, Password: Admin123')
-            print('Secret word: кукуку, Access code: 12345678')
-            print('=' * 50)
-
-
-# Для gunicorn
-init_db()
+    if not User.query.filter_by(username='admin').first():
+        admin = User(
+            username='admin',
+            email='admin@quiz.com',
+            password_hash=generate_password_hash('Admin123'),
+            is_admin=True
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print('=' * 50)
+        print('Admin created! Login: admin, Password: Admin123')
+        print('Secret word: кукуку, Access code: 12345678')
+        print('=' * 50)
 
 if __name__ == '__main__':
-    init_db()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=10000)

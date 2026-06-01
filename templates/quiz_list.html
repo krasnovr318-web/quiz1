@@ -1,82 +1,73 @@
 {% extends "base.html" %}
 
-{% block title %}Викторина: {{ quiz.title }}{% endblock %}
+{% block title %}Список викторин{% endblock %}
 
 {% block content %}
-<style>
-    .quiz-container {
-        background-color: {{ quiz.theme_color }};
-        color: {{ quiz.text_color }};
-        min-height: 80vh;
-    }
-    .btn-quiz {
-        background-color: {{ quiz.button_color }};
-        color: {{ quiz.text_color }};
-        border: none;
-    }
-    .btn-quiz:hover {
-        opacity: 0.8;
-        color: {{ quiz.text_color }};
-    }
-    .form-check-input:checked {
-        background-color: {{ quiz.button_color }};
-        border-color: {{ quiz.text_color }};
-    }
-</style>
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-light mb-4">Все викторины</h2>
 
-<div class="quiz-container rounded p-4">
-    <h2 class="text-center mb-4">{{ quiz.title }}</h2>
-
-    <div class="text-center mb-4">
-        <h4>Время: <span id="timer">{{ quiz.time_limit }}</span> сек</h4>
-    </div>
-
-    <form method="POST" id="quizForm">
-        {% for question in questions %}
-            <div class="card bg-dark bg-opacity-25 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Вопрос {{ loop.index }}: {{ question.question_text }}</h5>
-
-                    {% for answer in question.parsed_answers %}
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio"
-                                   name="question_{{ question.id }}"
-                                   id="q{{ question.id }}_{{ loop.index0 }}"
-                                   value="{{ loop.index0 }}" required>
-                            <label class="form-check-label" for="q{{ question.id }}_{{ loop.index0 }}">
-                                {{ answer }}
-                            </label>
-                        </div>
-                    {% endfor %}
-                </div>
+        <!-- Поиск и сортировка -->
+        <div class="card bg-secondary mb-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="search"
+                               placeholder="Поиск по названию или ID" value="{{ request.args.get('search', '') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="sort">
+                            <option value="popular" {% if request.args.get('sort', 'popular') == 'popular' %}selected{% endif %}>
+                                По популярности
+                            </option>
+                            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>
+                                По новизне
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-dark w-100">Применить</button>
+                    </div>
+                </form>
             </div>
-        {% endfor %}
-
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-quiz btn-lg">Завершить викторину</button>
         </div>
-    </form>
+
+        <!-- Список викторин -->
+        {% if quizzes %}
+            <div class="row">
+                {% for quiz in quizzes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-light">{{ quiz.title }}</h5>
+                                <p class="card-text text-muted">
+                                    Автор: {{ quiz.creator.username }}<br>
+                                    Вопросов: {{ quiz.questions|length }}<br>
+                                    Создана: {{ quiz.created_at.strftime('%d.%m.%Y') }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                        <button class="btn btn-sm btn-success like-btn" data-quiz-id="{{ quiz.id }}">
+                                            👍 <span class="likes-count">{{ quiz.likes }}</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger dislike-btn" data-quiz-id="{{ quiz.id }}">
+                                            👎 <span class="dislikes-count">{{ quiz.dislikes }}</span>
+                                        </button>
+                                    </div>
+                                    <a href="{{ url_for('play_quiz', quiz_id=quiz.id) }}" class="btn btn-dark btn-sm">
+                                        Играть →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Викторин пока нет. <a href="{{ url_for('create_quiz') }}" class="alert-link">Создайте первую викторину!</a>
+            </div>
+        {% endif %}
+    </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-let timeLeft = {{ quiz.time_limit }};
-const timerElement = document.getElementById('timer');
-const form = document.getElementById('quizForm');
-
-const timer = setInterval(() => {
-    timeLeft--;
-    timerElement.textContent = timeLeft;
-
-    if (timeLeft <= 0) {
-        clearInterval(timer);
-        form.submit();
-    }
-}, 1000);
-
-form.addEventListener('submit', () => {
-    clearInterval(timer);
-});
-</script>
 {% endblock %}
