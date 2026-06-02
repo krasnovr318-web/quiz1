@@ -61,6 +61,7 @@ class Quiz(db.Model):
     theme_color = db.Column(db.String(7), default='#808080')
     text_color = db.Column(db.String(7), default='#FFFFFF')
     button_color = db.Column(db.String(7), default='#A0A0A0')
+    button_hover_color = db.Column(db.String(7), default='#C0C0C0')  # Новое поле
     time_limit = db.Column(db.Integer, default=30)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

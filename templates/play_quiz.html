@@ -28,7 +28,7 @@
         color: {{ quiz.text_color }};
     }
 
-    /* Декоративные элементы цветные */
+    /* Декоративные элементы */
     .quiz-container::before {
         color: {{ quiz.text_color }};
         opacity: 0.08;
@@ -46,28 +46,28 @@
         background-image: radial-gradient({{ quiz.text_color }} 2px, transparent 2px);
     }
 
-    /* Кнопки ответов - динамические */
+    /* Кнопки ответов - обычное состояние */
     .answer-btn {
         border: 2px solid {{ quiz.button_color }};
-        background: rgba(255, 255, 255, 0.9);
+        background: {{ quiz.button_color }};
         color: {{ quiz.text_color }};
     }
 
     .answer-letter {
-        background: {{ quiz.button_color }};
-        color: {{ quiz.text_color }};
+        background: {{ quiz.text_color }};
+        color: {{ quiz.button_color }};
     }
 
-    /* Эффект при наведении на кнопку */
+    /* Эффект при наведении - используем button_hover_color */
     .answer-btn:hover {
-        background: {{ quiz.button_color }};
-        border-color: {{ quiz.button_color }};
+        background: {{ quiz.button_hover_color }};
+        border-color: {{ quiz.button_hover_color }};
         transform: translateX(4px);
     }
 
     .answer-btn:hover .answer-letter {
         background: {{ quiz.text_color }};
-        color: {{ quiz.button_color }};
+        color: {{ quiz.button_hover_color }};
     }
 
     /* Выбранная кнопка */
@@ -128,9 +128,8 @@
     }
 
     .btn-primary:hover {
-        opacity: 0.8;
+        background: {{ quiz.button_hover_color }} !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .btn-secondary {
@@ -146,6 +145,7 @@
     }
 </style>
 
+<!-- Остальной HTML без изменений -->
 <div class="quiz-container p-4 p-md-5 position-relative" id="quizApp">
     <div class="decorative-dots"></div>
     <div class="decorative-dots-right"></div>
@@ -206,6 +206,7 @@
 </div>
 
 <script>
+// ... скрипт без изменений ...
 let currentQuestion = 0;
 let score = 0;
 let timeLeft = {{ quiz.time_limit }};

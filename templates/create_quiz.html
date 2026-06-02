@@ -5,43 +5,40 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="text-light mb-4">Создание викторины</h2>
+        <h2 class="mb-4" style="color: #4caf50;">📝 Создание викторины</h2>
 
         <form method="POST" id="quizForm">
-            <div class="card bg-secondary mb-4">
+            <div class="card mb-4">
                 <div class="card-body">
-                    <h4 class="text-light mb-3">Основные настройки</h4>
+                    <h5 class="mb-3" style="color: #4caf50;">Основные настройки</h5>
 
                     <div class="mb-3">
-                        <label for="title" class="form-label text-light">Название викторины</label>
-                        <input type="text" class="form-control bg-dark text-light border-secondary"
-                               id="title" name="title" required>
+                        <label for="title" class="form-label">Название викторины</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="theme_color" class="form-label text-light">Цвет фона</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="theme_color" name="theme_color" value="#808080">
+                        <div class="col-md-3 mb-3">
+                            <label for="theme_color" class="form-label">Цвет фона</label>
+                            <input type="color" class="form-control form-control-color" id="theme_color" name="theme_color" value="#808080">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="text_color" class="form-label text-light">Цвет текста</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="text_color" name="text_color" value="#FFFFFF">
+                        <div class="col-md-3 mb-3">
+                            <label for="text_color" class="form-label">Цвет текста</label>
+                            <input type="color" class="form-control form-control-color" id="text_color" name="text_color" value="#FFFFFF">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="button_color" class="form-label text-light">Цвет кнопок</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="button_color" name="button_color" value="#A0A0A0">
+                        <div class="col-md-3 mb-3">
+                            <label for="button_color" class="form-label">Цвет кнопки</label>
+                            <input type="color" class="form-control form-control-color" id="button_color" name="button_color" value="#4caf50">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="button_hover_color" class="form-label">Цвет кнопки при наведении</label>
+                            <input type="color" class="form-control form-control-color" id="button_hover_color" name="button_hover_color" value="#388e3c">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="time_limit" class="form-label text-light">
-                            Время на ответ (секунды, от 5 до 3600)
-                        </label>
-                        <input type="number" class="form-control bg-dark text-light border-secondary"
-                               id="time_limit" name="time_limit" value="30" min="5" max="3600" required>
+                        <label for="time_limit" class="form-label">Время на ответ (секунды, от 5 до 3600)</label>
+                        <input type="number" class="form-control" id="time_limit" name="time_limit" value="30" min="5" max="3600" required>
                     </div>
                 </div>
             </div>
@@ -53,13 +50,11 @@
             <input type="hidden" name="question_count" id="questionCount" value="0">
 
             <div class="mb-4">
-                <button type="button" class="btn btn-secondary" onclick="addQuestion()">
-                    Добавить вопрос
-                </button>
+                <button type="button" class="btn btn-success" onclick="addQuestion()">+ Добавить вопрос</button>
             </div>
 
             <div class="d-grid mb-5">
-                <button type="submit" class="btn btn-dark btn-lg">Создать викторину</button>
+                <button type="submit" class="btn btn-primary btn-lg">✨ Создать викторину</button>
             </div>
         </form>
     </div>
@@ -73,40 +68,37 @@ let questionCounter = 0;
 function addQuestion() {
     const container = document.getElementById('questionsContainer');
     const questionDiv = document.createElement('div');
-    questionDiv.className = 'card bg-secondary mb-4';
+    questionDiv.className = 'card mb-4';
     questionDiv.id = `question_${questionCounter}`;
 
     questionDiv.innerHTML = `
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="text-light">Вопрос ${questionCounter + 1}</h5>
+                <h5 class="mb-0" style="color: #4caf50;">Вопрос ${questionCounter + 1}</h5>
                 <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(${questionCounter})">
-                    Удалить
+                    🗑️ Удалить
                 </button>
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-light">Текст вопроса</label>
-                <input type="text" class="form-control bg-dark text-light border-secondary"
-                       name="question_${questionCounter}" required>
+                <label class="form-label">Текст вопроса</label>
+                <input type="text" class="form-control" name="question_${questionCounter}" required>
             </div>
 
             <div id="answers_${questionCounter}">
                 <div class="answer-group mb-2">
                     <div class="input-group">
-                        <input type="text" class="form-control bg-dark text-light border-secondary"
-                               name="answer_${questionCounter}_0" placeholder="Ответ 1" required>
-                        <div class="input-group-text bg-dark text-light border-secondary">
-                            <input type="radio" name="correct_answer_${questionCounter}" value="0" required>
+                        <input type="text" class="form-control" name="answer_${questionCounter}_0" placeholder="Ответ 1" required>
+                        <div class="input-group-text">
+                            <input type="radio" name="correct_answer_${questionCounter}" value="0" required> Правильный
                         </div>
                     </div>
                 </div>
                 <div class="answer-group mb-2">
                     <div class="input-group">
-                        <input type="text" class="form-control bg-dark text-light border-secondary"
-                               name="answer_${questionCounter}_1" placeholder="Ответ 2" required>
-                        <div class="input-group-text bg-dark text-light border-secondary">
-                            <input type="radio" name="correct_answer_${questionCounter}" value="1" required>
+                        <input type="text" class="form-control" name="answer_${questionCounter}_1" placeholder="Ответ 2" required>
+                        <div class="input-group-text">
+                            <input type="radio" name="correct_answer_${questionCounter}" value="1" required> Правильный
                         </div>
                     </div>
                 </div>
@@ -114,9 +106,8 @@ function addQuestion() {
 
             <input type="hidden" name="answer_count_${questionCounter}" id="answerCount_${questionCounter}" value="2">
 
-            <button type="button" class="btn btn-sm btn-secondary"
-                    onclick="addAnswer(${questionCounter})" id="addAnswerBtn_${questionCounter}">
-                Добавить ответ
+            <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addAnswer(${questionCounter})" id="addAnswerBtn_${questionCounter}">
+                + Добавить ответ
             </button>
             <small class="text-muted ms-2">Максимум 10 ответов</small>
         </div>
@@ -131,10 +122,17 @@ function removeQuestion(index) {
     const question = document.getElementById(`question_${index}`);
     if (question) {
         question.remove();
-        // Пересчет количества вопросов
         const remaining = document.querySelectorAll('[id^="question_"]');
         questionCounter = remaining.length;
         document.getElementById('questionCount').value = questionCounter;
+
+        // Перенумеровываем заголовки вопросов
+        remaining.forEach((q, idx) => {
+            const header = q.querySelector('h5');
+            if (header) {
+                header.textContent = `Вопрос ${idx + 1}`;
+            }
+        });
     }
 }
 
@@ -151,10 +149,9 @@ function addAnswer(questionIndex) {
     newAnswer.className = 'answer-group mb-2';
     newAnswer.innerHTML = `
         <div class="input-group">
-            <input type="text" class="form-control bg-dark text-light border-secondary"
-                   name="answer_${questionIndex}_${answerCount}" placeholder="Ответ ${answerCount + 1}" required>
-            <div class="input-group-text bg-dark text-light border-secondary">
-                <input type="radio" name="correct_answer_${questionIndex}" value="${answerCount}" required>
+            <input type="text" class="form-control" name="answer_${questionIndex}_${answerCount}" placeholder="Ответ ${answerCount + 1}" required>
+            <div class="input-group-text">
+                <input type="radio" name="correct_answer_${questionIndex}" value="${answerCount}" required> Правильный
             </div>
         </div>
     `;
@@ -162,7 +159,6 @@ function addAnswer(questionIndex) {
     answersDiv.appendChild(newAnswer);
     document.getElementById(`answerCount_${questionIndex}`).value = answerCount + 1;
 
-    // Скрываем кнопку если достигнут лимит
     if (answerCount + 1 >= 10) {
         document.getElementById(`addAnswerBtn_${questionIndex}`).style.display = 'none';
     }

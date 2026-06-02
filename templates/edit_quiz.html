@@ -5,44 +5,40 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="text-light mb-4">Редактирование викторины</h2>
+        <h2 class="mb-4" style="color: #4caf50;">✏️ Редактирование викторины</h2>
 
         <form method="POST" id="quizForm">
-            <div class="card bg-secondary mb-4">
+            <div class="card mb-4">
                 <div class="card-body">
-                    <h4 class="text-light mb-3">Основные настройки</h4>
+                    <h5 class="mb-3" style="color: #4caf50;">Основные настройки</h5>
 
                     <div class="mb-3">
-                        <label for="title" class="form-label text-light">Название викторины</label>
-                        <input type="text" class="form-control bg-dark text-light border-secondary"
-                               id="title" name="title" value="{{ quiz.title }}" required>
+                        <label for="title" class="form-label">Название викторины</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ quiz.title }}" required>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="theme_color" class="form-label text-light">Цвет фона</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="theme_color" name="theme_color" value="{{ quiz.theme_color }}">
+                        <div class="col-md-3 mb-3">
+                            <label for="theme_color" class="form-label">Цвет фона</label>
+                            <input type="color" class="form-control form-control-color" id="theme_color" name="theme_color" value="{{ quiz.theme_color }}">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="text_color" class="form-label text-light">Цвет текста</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="text_color" name="text_color" value="{{ quiz.text_color }}">
+                        <div class="col-md-3 mb-3">
+                            <label for="text_color" class="form-label">Цвет текста</label>
+                            <input type="color" class="form-control form-control-color" id="text_color" name="text_color" value="{{ quiz.text_color }}">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="button_color" class="form-label text-light">Цвет кнопок</label>
-                            <input type="color" class="form-control form-control-color bg-dark"
-                                   id="button_color" name="button_color" value="{{ quiz.button_color }}">
+                        <div class="col-md-3 mb-3">
+                            <label for="button_color" class="form-label">Цвет кнопки</label>
+                            <input type="color" class="form-control form-control-color" id="button_color" name="button_color" value="{{ quiz.button_color }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="button_hover_color" class="form-label">Цвет кнопки при наведении</label>
+                            <input type="color" class="form-control form-control-color" id="button_hover_color" name="button_hover_color" value="{{ quiz.button_hover_color }}">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="time_limit" class="form-label text-light">
-                            Время на ответ (секунды)
-                        </label>
-                        <input type="number" class="form-control bg-dark text-light border-secondary"
-                               id="time_limit" name="time_limit" value="{{ quiz.time_limit }}"
-                               min="5" max="3600" required>
+                        <label for="time_limit" class="form-label">Время на ответ (секунды)</label>
+                        <input type="number" class="form-control" id="time_limit" name="time_limit" value="{{ quiz.time_limit }}" min="5" max="3600" required>
                     </div>
                 </div>
             </div>
@@ -54,13 +50,11 @@
             <input type="hidden" name="question_count" id="questionCount" value="0">
 
             <div class="mb-4">
-                <button type="button" class="btn btn-secondary" onclick="addQuestion()">
-                    Добавить вопрос
-                </button>
+                <button type="button" class="btn btn-success" onclick="addQuestion()">+ Добавить вопрос</button>
             </div>
 
             <div class="d-grid mb-5">
-                <button type="submit" class="btn btn-dark btn-lg">Сохранить изменения</button>
+                <button type="submit" class="btn btn-primary btn-lg">💾 Сохранить изменения</button>
             </div>
         </form>
     </div>
@@ -74,7 +68,7 @@ let questionCounter = 0;
 function addQuestion(questionData = null) {
     const container = document.getElementById('questionsContainer');
     const questionDiv = document.createElement('div');
-    questionDiv.className = 'card bg-secondary mb-4';
+    questionDiv.className = 'card mb-4';
     questionDiv.id = `question_${questionCounter}`;
 
     let questionText = questionData ? questionData.text : '';
@@ -86,12 +80,9 @@ function addQuestion(questionData = null) {
         answersHTML += `
             <div class="answer-group mb-2">
                 <div class="input-group">
-                    <input type="text" class="form-control bg-dark text-light border-secondary"
-                           name="answer_${questionCounter}_${index}"
-                           value="${answer}" placeholder="Ответ ${index + 1}" required>
-                    <div class="input-group-text bg-dark text-light border-secondary">
-                        <input type="radio" name="correct_answer_${questionCounter}"
-                               value="${index}" ${index === correctAnswer ? 'checked' : ''} required>
+                    <input type="text" class="form-control" name="answer_${questionCounter}_${index}" value="${answer.replace(/"/g, '&quot;')}" placeholder="Ответ ${index + 1}" required>
+                    <div class="input-group-text">
+                        <input type="radio" name="correct_answer_${questionCounter}" value="${index}" ${index === correctAnswer ? 'checked' : ''} required> Правильный
                     </div>
                 </div>
             </div>
@@ -101,28 +92,25 @@ function addQuestion(questionData = null) {
     questionDiv.innerHTML = `
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="text-light">Вопрос ${questionCounter + 1}</h5>
+                <h5 class="mb-0" style="color: #4caf50;">Вопрос ${questionCounter + 1}</h5>
                 <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(${questionCounter})">
-                    Удалить
+                    🗑️ Удалить
                 </button>
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-light">Текст вопроса</label>
-                <input type="text" class="form-control bg-dark text-light border-secondary"
-                       name="question_${questionCounter}" value="${questionText}" required>
+                <label class="form-label">Текст вопроса</label>
+                <input type="text" class="form-control" name="question_${questionCounter}" value="${questionText.replace(/"/g, '&quot;')}" required>
             </div>
 
             <div id="answers_${questionCounter}">
                 ${answersHTML}
             </div>
 
-            <input type="hidden" name="answer_count_${questionCounter}"
-                   id="answerCount_${questionCounter}" value="${answers.length}">
+            <input type="hidden" name="answer_count_${questionCounter}" id="answerCount_${questionCounter}" value="${answers.length}">
 
-            <button type="button" class="btn btn-sm btn-secondary"
-                    onclick="addAnswer(${questionCounter})" id="addAnswerBtn_${questionCounter}">
-                Добавить ответ
+            <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addAnswer(${questionCounter})" id="addAnswerBtn_${questionCounter}">
+                + Добавить ответ
             </button>
             <small class="text-muted ms-2">Максимум 10 ответов</small>
         </div>
@@ -140,6 +128,13 @@ function removeQuestion(index) {
         const remaining = document.querySelectorAll('[id^="question_"]');
         questionCounter = remaining.length;
         document.getElementById('questionCount').value = questionCounter;
+
+        remaining.forEach((q, idx) => {
+            const header = q.querySelector('h5');
+            if (header) {
+                header.textContent = `Вопрос ${idx + 1}`;
+            }
+        });
     }
 }
 
@@ -156,12 +151,9 @@ function addAnswer(questionIndex) {
     newAnswer.className = 'answer-group mb-2';
     newAnswer.innerHTML = `
         <div class="input-group">
-            <input type="text" class="form-control bg-dark text-light border-secondary"
-                   name="answer_${questionIndex}_${answerCount}"
-                   placeholder="Ответ ${answerCount + 1}" required>
-            <div class="input-group-text bg-dark text-light border-secondary">
-                <input type="radio" name="correct_answer_${questionIndex}"
-                       value="${answerCount}" required>
+            <input type="text" class="form-control" name="answer_${questionIndex}_${answerCount}" placeholder="Ответ ${answerCount + 1}" required>
+            <div class="input-group-text">
+                <input type="radio" name="correct_answer_${questionIndex}" value="${answerCount}" required> Правильный
             </div>
         </div>
     `;
@@ -175,13 +167,15 @@ function addAnswer(questionIndex) {
 }
 
 // Загрузка существующих вопросов
-{% for question in quiz.questions %}
-    addQuestion({
-        text: "{{ question.question_text|replace('"', '\\"')|safe }}",
-        answers: {{ question.answers|safe }},
-        correct: {{ question.correct_answer }}
-    });
-{% endfor %}
+{% if quiz.questions %}
+    {% for question in quiz.questions %}
+        addQuestion({
+            text: "{{ question.question_text|replace('"', '\\"')|safe }}",
+            answers: {{ question.answers|safe }},
+            correct: {{ question.correct_answer }}
+        });
+    {% endfor %}
+{% endif %}
 
 // Если нет вопросов, добавляем один пустой
 if (questionCounter === 0) {
