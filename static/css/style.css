@@ -562,3 +562,74 @@ main {
         display: none;
     }
 }
+/* Декоративная крутящаяся лупа */
+.decorative-magnifier {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 80px;
+    height: 80px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    animation: rotate 8s linear infinite;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.decorative-magnifier:hover {
+    transform: scale(1.1);
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.6);
+}
+
+.magnifier-handle {
+    position: absolute;
+    width: 25px;
+    height: 8px;
+    background: rgba(76, 175, 80, 0.5);
+    border-radius: 4px;
+    bottom: -15px;
+    right: 5px;
+    transform: rotate(45deg);
+}
+
+.magnifier-glass {
+    font-size: 40px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Для мобильных - немного меньше */
+@media (max-width: 768px) {
+    .decorative-magnifier {
+        width: 60px;
+        height: 60px;
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .magnifier-glass {
+        font-size: 30px;
+    }
+
+    .magnifier-handle {
+        width: 18px;
+        height: 6px;
+        bottom: -10px;
+        right: 3px;
+    }
+}

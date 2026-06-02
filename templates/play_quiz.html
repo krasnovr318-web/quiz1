@@ -22,16 +22,11 @@
                 <div class="row justify-content-center">
                     <div class="col-12">
                         {% for answer in question.parsed_answers %}
-                            <div class="answer-wrapper">
-                                <button class="answer-btn"
-                                        onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
-                                        data-answer="{{ loop.index0 }}">
-                                    {{ answer }}
-                                </button>
-                                <button class="magnify-btn" onclick="magnifyText(this, '{{ answer|replace("'", "\\'")|safe }}')">
-                                    🔍
-                                </button>
-                            </div>
+                            <button class="answer-btn w-100 mb-2"
+                                    onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
+                                    data-answer="{{ loop.index0 }}">
+                                {{ answer }}
+                            </button>
                         {% endfor %}
                     </div>
                 </div>
@@ -65,6 +60,12 @@
     </div>
 </div>
 
+<!-- Декоративная крутящаяся лупа -->
+<div class="decorative-magnifier">
+    <div class="magnifier-glass">🔍</div>
+    <div class="magnifier-handle"></div>
+</div>
+
 <script>
 let currentQuestion = 0;
 let score = 0;
@@ -96,11 +97,8 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     answered = true;
     clearInterval(timerInterval);
 
-    const wrapper = button.parentElement;
-    const allWrappers = wrapper.parentElement.querySelectorAll('.answer-wrapper');
-
-    allWrappers.forEach(w => {
-        const btn = w.querySelector('.answer-btn');
+    const allButtons = button.parentElement.querySelectorAll('.answer-btn');
+    allButtons.forEach(btn => {
         btn.style.pointerEvents = 'none';
         const btnAnswer = parseInt(btn.dataset.answer);
         if (btnAnswer === correctAnswer) {
@@ -118,22 +116,6 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     setTimeout(() => {
         nextQuestion();
     }, 1500);
-}
-
-function magnifyText(button, text) {
-    // Анимация кнопки
-    button.classList.add('animate');
-
-    // Создаем всплывающую подсказку
-    const tooltip = document.createElement('div');
-    tooltip.className = 'magnify-tooltip';
-    tooltip.textContent = text;
-    document.body.appendChild(tooltip);
-
-    setTimeout(() => {
-        tooltip.remove();
-        button.classList.remove('animate');
-    }, 2000);
 }
 
 function nextQuestion() {
