@@ -3,8 +3,98 @@
 {% block title %}Викторина: {{ quiz.title }}{% endblock %}
 
 {% block content %}
+<style>
+    /* Только динамические цвета, которые зависят от БД */
+    .quiz-container {
+        background: {{ quiz.theme_color }};
+    }
+
+    .quiz-container h2,
+    .quiz-container h3,
+    .text-muted {
+        color: {{ quiz.text_color }} !important;
+    }
+
+    .progress-bar {
+        background: {{ quiz.button_color }} !important;
+    }
+
+    .timer-circle {
+        border: 2px solid {{ quiz.button_color }};
+        color: {{ quiz.text_color }};
+    }
+
+    .quiz-container::before {
+        color: {{ quiz.text_color }};
+    }
+
+    .quiz-container::after {
+        color: {{ quiz.text_color }};
+    }
+
+    .decorative-dots {
+        background-image: radial-gradient({{ quiz.text_color }} 2px, transparent 2px);
+    }
+
+    .decorative-dots-right {
+        background-image: radial-gradient({{ quiz.text_color }} 2px, transparent 2px);
+    }
+
+    .answer-btn {
+        border: 1px solid {{ quiz.button_color }};
+        color: {{ quiz.text_color }};
+    }
+
+    .answer-btn:hover {
+        background: {{ quiz.button_color }};
+        border-color: {{ quiz.button_color }};
+    }
+
+    .answer-btn:hover .answer-letter {
+        background: white;
+        color: {{ quiz.button_color }};
+    }
+
+    .answer-btn.selected {
+        background: {{ quiz.button_color }};
+        border-color: {{ quiz.button_color }};
+        color: {{ quiz.text_color }};
+    }
+
+    .answer-btn.selected .answer-letter {
+        background: {{ quiz.text_color }};
+        color: {{ quiz.button_color }};
+    }
+
+    .stat-card {
+        border: 1px solid {{ quiz.button_color }};
+    }
+
+    .stat-number {
+        color: {{ quiz.button_color }};
+    }
+
+    .stat-label {
+        color: {{ quiz.text_color }};
+    }
+
+    .btn-primary {
+        background: {{ quiz.button_color }} !important;
+        color: {{ quiz.text_color }} !important;
+    }
+
+    .btn-secondary {
+        border-color: {{ quiz.button_color }} !important;
+        color: {{ quiz.text_color }} !important;
+    }
+
+    .btn-secondary:hover {
+        background: {{ quiz.button_color }} !important;
+        color: {{ quiz.text_color }} !important;
+    }
+</style>
+
 <div class="quiz-container p-4 p-md-5 position-relative" id="quizApp">
-    <!-- Декоративные элементы -->
     <div class="decorative-dots"></div>
     <div class="decorative-dots-right"></div>
 
