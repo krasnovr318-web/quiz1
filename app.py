@@ -228,9 +228,15 @@ def create_quiz():
         button_color = request.form.get('button_color', '#A0A0A0')
         button_hover_color = request.form.get('button_hover_color', '#C0C0C0')
         time_limit = int(request.form.get('time_limit', 30))
-        timer_enabled = request.form.get('timer_enabled') == 'true'  # Новое поле
+        timer_enabled = request.form.get('timer_enabled') == 'true'
 
-        # ... остальной код ...
+        if time_limit < 5 or time_limit > 3600:
+            flash('Время должно быть от 5 секунд до 3600 секунд', 'error')
+            return render_template('create_quiz.html')
+
+        # ВАЖНО: СНАЧАЛА ОПРЕДЕЛЯЕМ quiz_id и quiz_code
+        quiz_id = generate_id()
+        quiz_code = generate_code()
 
         quiz = Quiz(
             id=quiz_id,
@@ -241,7 +247,7 @@ def create_quiz():
             button_color=button_color,
             button_hover_color=button_hover_color,
             time_limit=time_limit,
-            timer_enabled=timer_enabled,  # Добавить
+            timer_enabled=timer_enabled,
             user_id=current_user.id
         )
 
@@ -450,10 +456,14 @@ def edit_quiz(quiz_id):
         quiz.theme_color = request.form.get('theme_color', quiz.theme_color)
         quiz.text_color = request.form.get('text_color', quiz.text_color)
         quiz.button_color = request.form.get('button_color', quiz.button_color)
+        quiz.button_hover_color = request.form.get('button_hover_color', quiz.button_hover_color)
         quiz.time_limit = int(request.form.get('time_limit', quiz.time_limit))
+        quiz.timer_enabled = request.form.get('timer_enabled') == 'true'
 
+        # Удаление старых вопросов
         Question.query.filter_by(quiz_id=quiz_id).delete()
 
+        # Добавление новых вопросов
         question_count = int(request.form.get('question_count', 1))
 
         for i in range(question_count):
