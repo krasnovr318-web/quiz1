@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* Только динамические цвета, которые зависят от БД */
+    /* Динамические цвета из базы данных */
     .quiz-container {
         background: {{ quiz.theme_color }};
     }
@@ -13,6 +13,10 @@
     .quiz-container h3,
     .text-muted {
         color: {{ quiz.text_color }} !important;
+    }
+
+    .progress {
+        background: rgba(255, 255, 255, 0.2);
     }
 
     .progress-bar {
@@ -24,8 +28,10 @@
         color: {{ quiz.text_color }};
     }
 
+    /* Декоративные элементы цветные */
     .quiz-container::before {
         color: {{ quiz.text_color }};
+        opacity: 0.08;
     }
 
     .quiz-container::after {
@@ -40,21 +46,31 @@
         background-image: radial-gradient({{ quiz.text_color }} 2px, transparent 2px);
     }
 
+    /* Кнопки ответов - динамические */
     .answer-btn {
-        border: 1px solid {{ quiz.button_color }};
+        border: 2px solid {{ quiz.button_color }};
+        background: rgba(255, 255, 255, 0.9);
         color: {{ quiz.text_color }};
     }
 
+    .answer-letter {
+        background: {{ quiz.button_color }};
+        color: {{ quiz.text_color }};
+    }
+
+    /* Эффект при наведении на кнопку */
     .answer-btn:hover {
         background: {{ quiz.button_color }};
         border-color: {{ quiz.button_color }};
+        transform: translateX(4px);
     }
 
     .answer-btn:hover .answer-letter {
-        background: white;
+        background: {{ quiz.text_color }};
         color: {{ quiz.button_color }};
     }
 
+    /* Выбранная кнопка */
     .answer-btn.selected {
         background: {{ quiz.button_color }};
         border-color: {{ quiz.button_color }};
@@ -66,8 +82,34 @@
         color: {{ quiz.button_color }};
     }
 
+    /* Правильный ответ (зеленый) */
+    .answer-btn.correct {
+        background: #00b894 !important;
+        border-color: #00b894 !important;
+        color: white !important;
+    }
+
+    .answer-btn.correct .answer-letter {
+        background: white !important;
+        color: #00b894 !important;
+    }
+
+    /* Неправильный ответ (красный) */
+    .answer-btn.wrong {
+        background: #d63031 !important;
+        border-color: #d63031 !important;
+        color: white !important;
+    }
+
+    .answer-btn.wrong .answer-letter {
+        background: white !important;
+        color: #d63031 !important;
+    }
+
+    /* Статистика */
     .stat-card {
-        border: 1px solid {{ quiz.button_color }};
+        border: 2px solid {{ quiz.button_color }};
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .stat-number {
@@ -78,19 +120,29 @@
         color: {{ quiz.text_color }};
     }
 
+    /* Кнопки лайка и дизлайка */
     .btn-primary {
         background: {{ quiz.button_color }} !important;
+        border: none !important;
         color: {{ quiz.text_color }} !important;
     }
 
+    .btn-primary:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
     .btn-secondary {
-        border-color: {{ quiz.button_color }} !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 2px solid {{ quiz.button_color }} !important;
         color: {{ quiz.text_color }} !important;
     }
 
     .btn-secondary:hover {
         background: {{ quiz.button_color }} !important;
         color: {{ quiz.text_color }} !important;
+        transform: translateY(-2px);
     }
 </style>
 
