@@ -7,7 +7,7 @@
     <div class="col-12">
         <h2 class="mb-4" style="color: #4caf50;">👤 Профиль: {{ user.username }}</h2>
 
-        <!-- Статистика в одну строку -->
+        <!-- Статистика -->
         <div class="row mb-5">
             <div class="col-md-3 col-6 mb-3">
                 <div class="stat-card">
@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <!-- Кнопки действий вертикально -->
+        <!-- Кнопки действий -->
         <div class="profile-buttons mb-5">
             <a href="{{ url_for('logout') }}" class="btn btn-secondary">🚪 Выйти из аккаунта</a>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
