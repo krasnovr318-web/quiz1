@@ -336,3 +336,23 @@ body {
         font-size: 22px;
     }
 }
+/* Футер */
+.footer {
+    margin-top: auto;
+}
+
+.footer a:hover {
+    text-decoration: underline !important;
+    opacity: 0.8;
+}
+
+/* Для прижатия футера к низу */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
