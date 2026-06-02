@@ -5,52 +5,90 @@
 {% block content %}
 <style>
     .quiz-container {
-        background: linear-gradient(135deg, {{ quiz.theme_color }} 0%, {{ quiz.theme_color }}dd 100%);
-        color: {{ quiz.text_color }};
-        min-height: 80vh;
-        border-radius: 30px;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e0ddd5;
     }
 
     .answer-btn {
-        background: rgba(0, 0, 0, 0.2);
-        border: 2px solid {{ quiz.button_color }};
-        color: {{ quiz.text_color }};
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 16px 20px;
+        margin: 8px 0;
+        border-radius: 12px;
+        border: 1px solid #e0ddd5;
+        background: #ffffff;
+        color: #555;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: left;
     }
 
     .answer-btn:hover {
-        background: {{ quiz.button_color }};
-        color: {{ quiz.text_color }};
+        background: #faf9f7;
+        border-color: #c4a882;
+        transform: translateX(4px);
     }
 
     .answer-btn.selected {
-        background: {{ quiz.button_color }};
-        border-color: {{ quiz.text_color }};
+        background: #8b7355;
+        border-color: #8b7355;
+        color: white;
     }
 
     .answer-btn.correct {
-        background: #00b894 !important;
-        border-color: #00b894 !important;
+        background: #9b8c7c;
+        border-color: #9b8c7c;
+        color: white;
     }
 
     .answer-btn.wrong {
-        background: #d63031 !important;
-        border-color: #d63031 !important;
+        background: #c9a58b;
+        border-color: #c9a58b;
+        color: white;
     }
 
-    .timer-circle {
-        border-color: {{ quiz.button_color }};
-        color: {{ quiz.text_color }};
-        background: rgba(0, 0, 0, 0.3);
+    .answer-btn::after {
+        content: "🔍";
+        font-size: 18px;
+        opacity: 0.5;
+        transition: opacity 0.3s;
+    }
+
+    .answer-btn:hover::after {
+        opacity: 1;
+    }
+
+    .answer-btn.selected::after,
+    .answer-btn.correct::after {
+        content: "✓";
+        opacity: 1;
+    }
+
+    .answer-btn.wrong::after {
+        content: "✗";
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .answer-btn::after {
+            content: "🔍";
+            font-size: 14px;
+        }
     }
 </style>
 
-<div class="quiz-container p-5" id="quizApp">
+<div class="quiz-container p-4 p-md-5" id="quizApp">
     <div class="text-center mb-4">
-        <h2 class="mb-2">{{ quiz.title }}</h2>
+        <h2 class="mb-3" style="color: #8b7355;">{{ quiz.title }}</h2>
         <div class="progress mb-3">
             <div class="progress-bar" id="progressBar" style="width: 0%"></div>
         </div>
-        <p class="mb-2">Вопрос <span id="currentQuestionNum">1</span> из <span id="totalQuestions">{{ questions|length }}</span></p>
+        <p class="mb-2" style="color: #888;">Вопрос <span id="currentQuestionNum">1</span> из <span id="totalQuestions">{{ questions|length }}</span></p>
         <div class="timer-circle mx-auto mb-3">
             <span id="timer">{{ quiz.time_limit }}</span>
         </div>
@@ -59,17 +97,17 @@
     <div id="questionsContainer">
         {% for question in questions %}
             <div class="question-slide" id="question_{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
-                <h3 class="text-center mb-4">{{ question.question_text }}</h3>
-                <div class="row">
-                    {% for answer in question.parsed_answers %}
-                        <div class="col-12 mb-3">
+                <h3 class="text-center mb-4" style="color: #555;">{{ question.question_text }}</h3>
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        {% for answer in question.parsed_answers %}
                             <button class="answer-btn"
                                     onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
                                     data-answer="{{ loop.index0 }}">
                                 {{ answer }}
                             </button>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% endfor %}
@@ -77,24 +115,24 @@
 
     <div id="resultsContainer" style="display: none;">
         <div class="text-center">
-            <h2 class="mb-4">🎉 Викторина завершена!</h2>
+            <h2 class="mb-4" style="color: #8b7355;">🎉 Викторина завершена!</h2>
             <div class="stat-card mb-4">
                 <div class="stat-number" id="finalScore">0/{{ questions|length }}</div>
                 <div class="stat-label">Правильных ответов</div>
             </div>
             <div class="row mb-4">
                 <div class="col-6">
-                    <button class="btn btn-success w-100" onclick="likeQuiz()">
+                    <button class="btn btn-dark w-100" onclick="likeQuiz()">
                         👍 <span id="likesCount">{{ quiz.likes }}</span>
                     </button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-danger w-100" onclick="dislikeQuiz()">
+                    <button class="btn btn-secondary w-100" onclick="dislikeQuiz()">
                         👎 <span id="dislikesCount">{{ quiz.dislikes }}</span>
                     </button>
                 </div>
             </div>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-dark w-100">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary w-100">
                 🏠 В главное меню
             </a>
         </div>
@@ -132,7 +170,7 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     answered = true;
     clearInterval(timerInterval);
 
-    const allButtons = button.parentElement.parentElement.querySelectorAll('.answer-btn');
+    const allButtons = button.parentElement.querySelectorAll('.answer-btn');
     allButtons.forEach(btn => {
         btn.style.pointerEvents = 'none';
         const btnAnswer = parseInt(btn.dataset.answer);

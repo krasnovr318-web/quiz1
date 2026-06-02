@@ -5,302 +5,328 @@
 }
 
 body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(135deg, #f5f5f0 0%, #e8e4d8 100%);
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.bg-gradient {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    color: #333;
 }
 
 /* Навигация */
 .navbar {
-    background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
-    border-bottom: 2px solid #e94560;
+    background: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    border-bottom: 1px solid #e0ddd5;
 }
 
 .navbar-brand {
-    color: #e94560 !important;
-    transition: all 0.3s;
+    color: #8b7355 !important;
+    font-weight: 600;
 }
 
 .navbar-brand:hover {
-    transform: scale(1.05);
-    text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+    color: #6b5340 !important;
 }
 
 .nav-link {
-    border-radius: 20px !important;
+    color: #555 !important;
+    border-radius: 8px !important;
     margin: 0 3px;
     transition: all 0.3s !important;
 }
 
 .nav-link:hover {
-    background: rgba(233, 69, 96, 0.2) !important;
-    transform: translateY(-2px);
+    background: #f0ece4 !important;
+    color: #8b7355 !important;
 }
 
 /* Карточки */
 .card {
-    border-radius: 20px !important;
-    border: none !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+    border-radius: 16px !important;
+    border: 1px solid #e0ddd5 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-    border: 1px solid rgba(233, 69, 96, 0.2) !important;
+    background: #ffffff !important;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(233, 69, 96, 0.2) !important;
-    border-color: #e94560 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
 }
 
 .card.bg-secondary {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: #ffffff !important;
 }
 
 /* Кнопки */
 .btn {
-    border-radius: 25px !important;
-    padding: 10px 25px !important;
-    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
+    font-weight: 500 !important;
     transition: all 0.3s ease !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
 }
 
 .btn-dark {
-    background: linear-gradient(135deg, #e94560 0%, #c23152 100%) !important;
+    background: #8b7355 !important;
     border: none !important;
     color: white !important;
 }
 
 .btn-dark:hover {
-    background: linear-gradient(135deg, #c23152 0%, #e94560 100%) !important;
-    box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
+    background: #6b5340 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(107, 83, 64, 0.2);
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%) !important;
-    border: 1px solid rgba(233, 69, 96, 0.3) !important;
+    background: #f0ece4 !important;
+    border: 1px solid #e0ddd5 !important;
+    color: #555 !important;
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #16213e 0%, #e94560 100%) !important;
+    background: #e8e4d8 !important;
+    color: #8b7355 !important;
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #00b894 0%, #00a381 100%) !important;
+    background: #9b8c7c !important;
     border: none !important;
+}
+
+.btn-success:hover {
+    background: #7a6b5b !important;
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #d63031 0%, #e17055 100%) !important;
+    background: #c9a58b !important;
     border: none !important;
 }
 
+.btn-danger:hover {
+    background: #b88d6e !important;
+}
+
 .btn-warning {
-    background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%) !important;
+    background: #d4c5b0 !important;
     border: none !important;
-    color: #1a1a2e !important;
+    color: #555 !important;
 }
 
 /* Формы */
 .form-control {
-    border-radius: 25px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(233, 69, 96, 0.3) !important;
-    color: white !important;
-    padding: 12px 20px !important;
-    transition: all 0.3s;
+    border-radius: 10px !important;
+    background: #faf9f7 !important;
+    border: 1px solid #e0ddd5 !important;
+    color: #333 !important;
+    padding: 12px 16px !important;
 }
 
 .form-control:focus {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: #e94560 !important;
-    box-shadow: 0 0 15px rgba(233, 69, 96, 0.3) !important;
+    background: #ffffff !important;
+    border-color: #c4a882 !important;
+    box-shadow: 0 0 0 3px rgba(196, 168, 130, 0.1) !important;
 }
 
 .form-label {
-    color: #e94560;
-    font-weight: 600;
+    color: #555;
+    font-weight: 500;
 }
 
 /* Таблицы */
 .table {
-    border-radius: 20px !important;
+    background: #ffffff;
+    border-radius: 12px;
     overflow: hidden;
-    background: rgba(26, 26, 46, 0.8);
 }
 
 .table-dark {
-    background: rgba(26, 26, 46, 0.9) !important;
+    background: #ffffff !important;
+    color: #333;
+}
+
+.table-dark th {
+    background: #faf9f7;
+    color: #555;
+    border-bottom: 1px solid #e0ddd5;
 }
 
 /* Алерты */
 .alert {
-    border-radius: 20px !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Модальные окна */
-.modal-content {
-    border-radius: 25px !important;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-    border: 1px solid rgba(233, 69, 96, 0.3) !important;
+    border-radius: 12px !important;
+    border: 1px solid #e0ddd5 !important;
+    background: #faf9f7;
 }
 
 /* Викторина */
 .quiz-container {
-    border-radius: 30px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
-    border: 2px solid rgba(233, 69, 96, 0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #faf9f7 100%);
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e0ddd5;
 }
 
 .answer-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 25px !important;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    font-size: 18px;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border-radius: 12px !important;
+    border: 1px solid #e0ddd5;
+    background: #ffffff;
+    color: #555;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.3s;
+    text-align: left;
 }
 
 .answer-btn:hover {
-    background: rgba(233, 69, 96, 0.2);
-    border-color: #e94560;
-    transform: scale(1.02);
+    background: #faf9f7;
+    border-color: #c4a882;
+    transform: translateX(4px);
 }
 
 .answer-btn.selected {
-    background: #e94560;
-    border-color: #e94560;
+    background: #8b7355;
+    border-color: #8b7355;
     color: white;
 }
 
 .answer-btn.correct {
-    background: #00b894;
-    border-color: #00b894;
+    background: #9b8c7c;
+    border-color: #9b8c7c;
+    color: white;
 }
 
 .answer-btn.wrong {
-    background: #d63031;
-    border-color: #d63031;
+    background: #c9a58b;
+    border-color: #c9a58b;
+    color: white;
 }
 
-/* Анимации */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Иконка лупы для ответов */
+.answer-btn::after {
+    content: "🔍";
+    font-size: 18px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.answer-btn:hover::after {
+    opacity: 1;
 }
 
-.card {
-    animation: fadeInUp 0.6s ease-out;
+.answer-btn.selected::after,
+.answer-btn.correct::after,
+.answer-btn.wrong::after {
+    content: "✓";
+    opacity: 1;
 }
 
-/* Счетчик времени */
+.answer-btn.wrong::after {
+    content: "✗";
+}
+
+/* Таймер */
 .timer-circle {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    border: 3px solid #e94560;
+    border: 2px solid #c4a882;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
-    color: #e94560;
-    background: rgba(233, 69, 96, 0.1);
+    color: #8b7355;
+    background: rgba(196, 168, 130, 0.1);
 }
 
 /* Прогресс бар */
 .progress {
-    border-radius: 25px !important;
-    height: 8px !important;
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px !important;
+    height: 6px !important;
+    background: #f0ece4;
 }
 
 .progress-bar {
-    background: linear-gradient(90deg, #e94560, #c23152) !important;
-    border-radius: 25px !important;
+    background: linear-gradient(90deg, #c4a882, #8b7355) !important;
+    border-radius: 12px !important;
+}
+
+/* Статистика - компактная */
+.stat-card {
+    background: #faf9f7;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #e0ddd5;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #8b7355;
+}
+
+.stat-label {
+    color: #888;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+/* Кнопки в профиле - друг под другом */
+.profile-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-buttons .btn {
+    width: 100%;
 }
 
 /* Скроллбар */
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #1a1a2e;
+    background: #f0ece4;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #e94560, #c23152);
-    border-radius: 5px;
+    background: #c4a882;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #e94560;
+    background: #8b7355;
 }
 
-/* Статистика */
-.stat-card {
-    background: rgba(233, 69, 96, 0.1);
-    border-radius: 20px;
-    padding: 20px;
-    text-align: center;
-    border: 1px solid rgba(233, 69, 96, 0.3);
-}
-
-.stat-number {
-    font-size: 36px;
-    font-weight: bold;
-    color: #e94560;
-}
-
-.stat-label {
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 5px;
-}
-
+/* Мобильная адаптация */
 @media (max-width: 768px) {
     .container {
-        padding: 10px;
+        padding: 12px;
     }
 
-    .card {
-        margin-bottom: 15px;
+    .quiz-container {
+        padding: 20px !important;
+    }
+
+    .answer-btn {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .answer-btn::after {
+        font-size: 16px;
+    }
+
+    .stat-number {
+        font-size: 22px;
     }
 }

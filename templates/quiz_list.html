@@ -5,58 +5,45 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="text-light mb-4">Все викторины</h2>
+        <h2 class="mb-4" style="color: #8b7355;">📚 Все викторины</h2>
 
-        <!-- Поиск и сортировка -->
-        <div class="card bg-secondary mb-4">
+        <div class="card mb-4">
             <div class="card-body">
                 <form method="GET" class="row g-3">
                     <div class="col-md-8">
                         <input type="text" class="form-control" name="search"
-                               placeholder="Поиск по названию или ID" value="{{ request.args.get('search', '') }}">
+                               placeholder="Поиск по названию" value="{{ request.args.get('search', '') }}">
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" name="sort">
-                            <option value="popular" {% if request.args.get('sort', 'popular') == 'popular' %}selected{% endif %}>
-                                По популярности
-                            </option>
-                            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>
-                                По новизне
-                            </option>
+                            <option value="popular" {% if request.args.get('sort', 'popular') == 'popular' %}selected{% endif %}>По популярности</option>
+                            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>По новизне</option>
                         </select>
                     </div>
                     <div class="col-md-1">
-                        <button type="submit" class="btn btn-dark w-100">Применить</button>
+                        <button type="submit" class="btn btn-dark w-100">Найти</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Список викторин -->
         {% if quizzes %}
             <div class="row">
                 {% for quiz in quizzes %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title text-light">{{ quiz.title }}</h5>
-                                <p class="card-text text-muted">
-                                    Автор: {{ quiz.creator.username }}<br>
-                                    Вопросов: {{ quiz.questions|length }}<br>
-                                    Создана: {{ quiz.created_at.strftime('%d.%m.%Y') }}
+                                <h5 class="card-title" style="color: #8b7355;">{{ quiz.title }}</h5>
+                                <p class="card-text small text-muted">
+                                    {{ quiz.creator.username }} • {{ quiz.questions|length }} вопросов<br>
+                                    {{ quiz.created_at.strftime('%d.%m.%Y') }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <div>
-                                        <button class="btn btn-sm btn-success like-btn" data-quiz-id="{{ quiz.id }}">
-                                            👍 <span class="likes-count">{{ quiz.likes }}</span>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger dislike-btn" data-quiz-id="{{ quiz.id }}">
-                                            👎 <span class="dislikes-count">{{ quiz.dislikes }}</span>
-                                        </button>
+                                        <button class="btn btn-sm btn-dark like-btn" data-quiz-id="{{ quiz.id }}">👍 <span class="likes-count">{{ quiz.likes }}</span></button>
+                                        <button class="btn btn-sm btn-secondary dislike-btn" data-quiz-id="{{ quiz.id }}">👎 <span class="dislikes-count">{{ quiz.dislikes }}</span></button>
                                     </div>
-                                    <a href="{{ url_for('play_quiz', quiz_id=quiz.id) }}" class="btn btn-dark btn-sm">
-                                        Играть →
-                                    </a>
+                                    <a href="{{ url_for('play_quiz', quiz_id=quiz.id) }}" class="btn btn-dark btn-sm">Играть →</a>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +52,7 @@
             </div>
         {% else %}
             <div class="alert alert-info">
-                Викторин пока нет. <a href="{{ url_for('create_quiz') }}" class="alert-link">Создайте первую викторину!</a>
+                Викторин пока нет. <a href="{{ url_for('create_quiz') }}" class="alert-link">Создайте первую!</a>
             </div>
         {% endif %}
     </div>

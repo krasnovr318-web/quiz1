@@ -3,49 +3,45 @@
 {% block title %}Главное меню{% endblock %}
 
 {% block content %}
-<div class="row mt-5">
+<div class="row mt-4">
     <div class="col-12 text-center mb-4">
-        <h1 class="text-light">Добро пожаловать, {{ current_user.username }}!</h1>
+        <h1 style="color: #8b7355;">Добро пожаловать, {{ current_user.username }}!</h1>
+        <p class="text-muted">Что хотите сделать?</p>
     </div>
 </div>
 
-<div class="row justify-content-center mt-4">
-    <div class="col-md-4 mb-4">
-        <div class="card bg-secondary h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title text-light">Создать викторину</h3>
-                <p class="card-text text-muted">Создайте свою уникальную викторину</p>
-                <a href="{{ url_for('create_quiz') }}" class="btn btn-dark">Перейти</a>
+<div class="row justify-content-center mt-3">
+    <div class="col-md-5 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <div class="display-1 mb-3">📝</div>
+                <h5 class="card-title" style="color: #8b7355;">Создать викторину</h5>
+                <p class="card-text text-muted small">Создайте свою уникальную викторину с вопросами</p>
+                <a href="{{ url_for('create_quiz') }}" class="btn btn-dark mt-2">Создать →</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-4">
-        <div class="card bg-secondary h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title text-light">Зайти по коду</h3>
-                <p class="card-text text-muted">Присоединитесь к викторине по коду</p>
-                <a href="{{ url_for('join_quiz') }}" class="btn btn-dark">Перейти</a>
+    <div class="col-md-5 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <div class="display-1 mb-3">🔑</div>
+                <h5 class="card-title" style="color: #8b7355;">Зайти по коду</h5>
+                <p class="card-text text-muted small">Присоединитесь к викторине по коду</p>
+                <a href="{{ url_for('join_quiz') }}" class="btn btn-dark mt-2">Ввести код →</a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-4 mb-4">
-        <div class="card bg-secondary h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title text-light">Список викторин</h3>
-                <p class="card-text text-muted">Просмотрите все доступные викторины</p>
-                <a href="{{ url_for('quiz_list') }}" class="btn btn-dark">Перейти</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-4">
-        <div class="card bg-secondary h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title text-light">Мой профиль</h3>
-                <p class="card-text text-muted">Просмотрите статистику и историю</p>
-                <a href="{{ url_for('profile') }}" class="btn btn-dark">Перейти</a>
+<div class="row justify-content-center">
+    <div class="col-md-5 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <div class="display-1 mb-3">👤</div>
+                <h5 class="card-title" style="color: #8b7355;">Мой профиль</h5>
+                <p class="card-text text-muted small">Просмотрите статистику и историю</p>
+                <a href="{{ url_for('profile') }}" class="btn btn-dark mt-2">Профиль →</a>
             </div>
         </div>
     </div>
