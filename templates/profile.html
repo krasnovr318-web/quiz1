@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="mb-4" style="color: #8b7355;">Профиль: {{ user.username }}</h2>
+        <h2 class="mb-4" style="color: #4caf50;">👤 Профиль: {{ user.username }}</h2>
 
         <!-- Статистика в одну строку -->
         <div class="row mb-5">
@@ -38,7 +38,7 @@
         <!-- Последние викторины -->
         <div class="card mb-4">
             <div class="card-body">
-                <h5 class="mb-3" style="color: #8b7355;">📊 Последние пройденные</h5>
+                <h5 class="mb-3" style="color: #4caf50;">📊 Последние пройденные</h5>
                 {% if recent_plays %}
                     <div class="table-responsive">
                         <table class="table">
@@ -51,7 +51,7 @@
                                     <td>{{ play.quiz.title }}</td>
                                     <td>{{ play.score }}/{{ play.quiz.questions|length }}</td>
                                     <td>{{ play.played_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                                    <td><a href="{{ url_for('play_quiz', quiz_id=play.quiz.id) }}" class="btn btn-sm btn-secondary">Снова</a></td>
+                                    <td><a href="{{ url_for('play_quiz', quiz_id=play.quiz.id) }}" class="btn btn-sm btn-success">Пройти</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -66,7 +66,7 @@
         <!-- Мои викторины -->
         <div class="card mb-4">
             <div class="card-body">
-                <h5 class="mb-3" style="color: #8b7355;">🎯 Мои викторины</h5>
+                <h5 class="mb-3" style="color: #4caf50;">🎯 Мои викторины</h5>
                 {% if created_quizzes %}
                     <div class="row">
                         {% for quiz in created_quizzes %}
@@ -76,9 +76,9 @@
                                     <h6 class="card-title">{{ quiz.title }}</h6>
                                     <p class="small text-muted">Код: {{ quiz.code }} | 👍 {{ quiz.likes }} 👎 {{ quiz.dislikes }}</p>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ url_for('play_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-dark">Играть</a>
-                                        <a href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-secondary">Изменить</a>
-                                        <form action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}" method="POST" onsubmit="return confirm('Удалить?');">
+                                        <a href="{{ url_for('play_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-success">Играть</a>
+                                        <a href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-warning">Изменить</a>
+                                        <form action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}" method="POST" onsubmit="return confirm('Удалить викторину?');">
                                             <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
                                         </form>
                                     </div>
@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <!-- Кнопки действий в колонку -->
+        <!-- Кнопки действий вертикально -->
         <div class="profile-buttons mb-5">
             <a href="{{ url_for('logout') }}" class="btn btn-secondary">🚪 Выйти из аккаунта</a>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
@@ -113,12 +113,12 @@
             </div>
             <form action="{{ url_for('delete_account') }}" method="POST">
                 <div class="modal-body">
-                    <p>Введите пароль:</p>
+                    <p>Введите пароль для подтверждения:</p>
                     <input type="password" class="form-control" name="password" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-danger">Удалить</button>
+                    <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
                 </div>
             </form>
         </div>

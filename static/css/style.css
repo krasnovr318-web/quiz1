@@ -5,44 +5,44 @@
 }
 
 body {
-    background: linear-gradient(135deg, #f5f5f0 0%, #e8e4d8 100%);
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    color: #2c3e2f;
 }
 
 /* Навигация */
 .navbar {
     background: #ffffff !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
-    border-bottom: 1px solid #e0ddd5;
+    border-bottom: 1px solid #a5d6a7;
 }
 
 .navbar-brand {
-    color: #8b7355 !important;
+    color: #4caf50 !important;
     font-weight: 600;
 }
 
 .navbar-brand:hover {
-    color: #6b5340 !important;
+    color: #388e3c !important;
 }
 
 .nav-link {
-    color: #555 !important;
+    color: #4a5b4e !important;
     border-radius: 8px !important;
     margin: 0 3px;
     transition: all 0.3s !important;
 }
 
 .nav-link:hover {
-    background: #f0ece4 !important;
-    color: #8b7355 !important;
+    background: #e8f5e9 !important;
+    color: #4caf50 !important;
 }
 
 /* Карточки */
 .card {
     border-radius: 16px !important;
-    border: 1px solid #e0ddd5 !important;
+    border: 1px solid #c8e6c9 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     transition: all 0.3s ease;
     background: #ffffff !important;
@@ -50,86 +50,103 @@ body {
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-}
-
-.card.bg-secondary {
-    background: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.1) !important;
+    border-color: #a5d6a7 !important;
 }
 
 /* Кнопки */
 .btn {
     border-radius: 10px !important;
-    padding: 12px 24px !important;
+    padding: 10px 20px !important;
     font-weight: 500 !important;
     transition: all 0.3s ease !important;
     font-size: 14px;
 }
 
-.btn-dark {
-    background: #8b7355 !important;
+.btn-primary {
+    background: #4caf50 !important;
     border: none !important;
     color: white !important;
 }
 
-.btn-dark:hover {
-    background: #6b5340 !important;
+.btn-primary:hover {
+    background: #388e3c !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(107, 83, 64, 0.2);
-}
-
-.btn-secondary {
-    background: #f0ece4 !important;
-    border: 1px solid #e0ddd5 !important;
-    color: #555 !important;
-}
-
-.btn-secondary:hover {
-    background: #e8e4d8 !important;
-    color: #8b7355 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .btn-success {
-    background: #9b8c7c !important;
+    background: #66bb6a !important;
     border: none !important;
+    color: white !important;
 }
 
 .btn-success:hover {
-    background: #7a6b5b !important;
+    background: #4caf50 !important;
 }
 
 .btn-danger {
-    background: #c9a58b !important;
+    background: #ef5350 !important;
     border: none !important;
+    color: white !important;
 }
 
 .btn-danger:hover {
-    background: #b88d6e !important;
+    background: #e53935 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
 }
 
 .btn-warning {
-    background: #d4c5b0 !important;
+    background: #ffb74d !important;
     border: none !important;
-    color: #555 !important;
+    color: #2c3e2f !important;
+}
+
+.btn-warning:hover {
+    background: #ffa726 !important;
+    color: #2c3e2f !important;
+}
+
+.btn-secondary {
+    background: #f5f5f5 !important;
+    border: 1px solid #d0d0d0 !important;
+    color: #4a5b4e !important;
+}
+
+.btn-secondary:hover {
+    background: #eeeeee !important;
+    color: #4caf50 !important;
+}
+
+.btn-outline {
+    background: transparent !important;
+    border: 1px solid #4caf50 !important;
+    color: #4caf50 !important;
+}
+
+.btn-outline:hover {
+    background: #4caf50 !important;
+    color: white !important;
 }
 
 /* Формы */
 .form-control {
     border-radius: 10px !important;
-    background: #faf9f7 !important;
-    border: 1px solid #e0ddd5 !important;
-    color: #333 !important;
+    background: #fafafa !important;
+    border: 1px solid #c8e6c9 !important;
+    color: #2c3e2f !important;
     padding: 12px 16px !important;
 }
 
 .form-control:focus {
     background: #ffffff !important;
-    border-color: #c4a882 !important;
-    box-shadow: 0 0 0 3px rgba(196, 168, 130, 0.1) !important;
+    border-color: #4caf50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
 }
 
 .form-label {
-    color: #555;
+    color: #4a5b4e;
     font-weight: 500;
 }
 
@@ -140,30 +157,25 @@ body {
     overflow: hidden;
 }
 
-.table-dark {
-    background: #ffffff !important;
-    color: #333;
-}
-
-.table-dark th {
-    background: #faf9f7;
-    color: #555;
-    border-bottom: 1px solid #e0ddd5;
+.table th {
+    background: #f1f8e9;
+    color: #4a5b4e;
+    border-bottom: 1px solid #c8e6c9;
 }
 
 /* Алерты */
 .alert {
     border-radius: 12px !important;
-    border: 1px solid #e0ddd5 !important;
-    background: #faf9f7;
+    border: 1px solid #c8e6c9 !important;
+    background: #f1f8e9;
 }
 
 /* Викторина */
 .quiz-container {
-    background: linear-gradient(135deg, #ffffff 0%, #faf9f7 100%);
+    background: #ffffff;
     border-radius: 24px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e0ddd5;
+    border: 1px solid #c8e6c9;
 }
 
 .answer-btn {
@@ -173,10 +185,10 @@ body {
     width: 100%;
     padding: 16px 20px;
     margin: 8px 0;
-    border-radius: 12px !important;
-    border: 1px solid #e0ddd5;
+    border-radius: 12px;
+    border: 1px solid #c8e6c9;
     background: #ffffff;
-    color: #555;
+    color: #4a5b4e;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s;
@@ -184,30 +196,29 @@ body {
 }
 
 .answer-btn:hover {
-    background: #faf9f7;
-    border-color: #c4a882;
+    background: #f1f8e9;
+    border-color: #4caf50;
     transform: translateX(4px);
 }
 
 .answer-btn.selected {
-    background: #8b7355;
-    border-color: #8b7355;
+    background: #4caf50;
+    border-color: #4caf50;
     color: white;
 }
 
 .answer-btn.correct {
-    background: #9b8c7c;
-    border-color: #9b8c7c;
+    background: #66bb6a;
+    border-color: #66bb6a;
     color: white;
 }
 
 .answer-btn.wrong {
-    background: #c9a58b;
-    border-color: #c9a58b;
+    background: #ef5350;
+    border-color: #ef5350;
     color: white;
 }
 
-/* Иконка лупы для ответов */
 .answer-btn::after {
     content: "🔍";
     font-size: 18px;
@@ -220,14 +231,14 @@ body {
 }
 
 .answer-btn.selected::after,
-.answer-btn.correct::after,
-.answer-btn.wrong::after {
+.answer-btn.correct::after {
     content: "✓";
     opacity: 1;
 }
 
 .answer-btn.wrong::after {
     content: "✗";
+    opacity: 1;
 }
 
 /* Таймер */
@@ -235,50 +246,50 @@ body {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    border: 2px solid #c4a882;
+    border: 2px solid #4caf50;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
     font-weight: bold;
-    color: #8b7355;
-    background: rgba(196, 168, 130, 0.1);
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
 }
 
 /* Прогресс бар */
 .progress {
     border-radius: 12px !important;
     height: 6px !important;
-    background: #f0ece4;
+    background: #e8f5e9;
 }
 
 .progress-bar {
-    background: linear-gradient(90deg, #c4a882, #8b7355) !important;
+    background: #4caf50 !important;
     border-radius: 12px !important;
 }
 
-/* Статистика - компактная */
+/* Статистика компактная */
 .stat-card {
-    background: #faf9f7;
+    background: #f1f8e9;
     border-radius: 16px;
     padding: 16px;
     text-align: center;
-    border: 1px solid #e0ddd5;
+    border: 1px solid #c8e6c9;
 }
 
 .stat-number {
     font-size: 28px;
     font-weight: bold;
-    color: #8b7355;
+    color: #4caf50;
 }
 
 .stat-label {
-    color: #888;
+    color: #6d8a73;
     margin-top: 5px;
     font-size: 13px;
 }
 
-/* Кнопки в профиле - друг под другом */
+/* Кнопки в профиле - вертикально */
 .profile-buttons {
     display: flex;
     flex-direction: column;
@@ -295,19 +306,18 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f0ece4;
+    background: #e8f5e9;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #c4a882;
+    background: #a5d6a7;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #8b7355;
+    background: #4caf50;
 }
 
-/* Мобильная адаптация */
 @media (max-width: 768px) {
     .container {
         padding: 12px;
@@ -320,10 +330,6 @@ body {
     .answer-btn {
         padding: 14px 16px;
         font-size: 14px;
-    }
-
-    .answer-btn::after {
-        font-size: 16px;
     }
 
     .stat-number {
