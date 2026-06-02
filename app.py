@@ -53,7 +53,6 @@ class User(UserMixin, db.Model):
     quizzes = db.relationship('Quiz', backref='creator', lazy=True)
     quiz_plays = db.relationship('QuizPlay', backref='player', lazy=True)
 
-
 class Quiz(db.Model):
     __tablename__ = 'quiz'
     id = db.Column(db.String(12), primary_key=True)
@@ -69,13 +68,13 @@ class Quiz(db.Model):
     dislikes = db.Column(db.Integer, default=0)
 
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
-    plays = db.relationship('QuizPlay', backref='quiz', lazy=True)
+    plays = db.relationship('QuizPlay', backref='quiz', lazy=True, cascade='all, delete-orphan')
 
 
 class Question(db.Model):
     __tablename__ = 'question'
     id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
+    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id', ondelete='CASCADE'), nullable=False)
     question_text = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Integer, nullable=False)
     answers = db.Column(db.Text, nullable=False)
@@ -84,8 +83,8 @@ class Question(db.Model):
 class QuizPlay(db.Model):
     __tablename__ = 'quiz_play'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id', ondelete='CASCADE'), nullable=False)
     score = db.Column(db.Integer, default=0)
     played_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -93,8 +92,8 @@ class QuizPlay(db.Model):
 class LikeDislike(db.Model):
     __tablename__ = 'like_dislike'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    quiz_id = db.Column(db.String(12), db.ForeignKey('quiz.id', ondelete='CASCADE'), nullable=False)
     is_like = db.Column(db.Boolean, nullable=False)
 
 
@@ -599,6 +598,17 @@ def admin_delete_user(user_id):
 @admin_required
 def admin_delete_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+
+    # Удаляем все связанные лайки/дизлайки
+    LikeDislike.query.filter_by(quiz_id=quiz_id).delete()
+
+    # Удаляем все связанные прохождения
+    QuizPlay.query.filter_by(quiz_id=quiz_id).delete()
+
+    # Удаляем все вопросы
+    Question.query.filter_by(quiz_id=quiz_id).delete()
+
+    # Удаляем саму викторину
     db.session.delete(quiz)
     db.session.commit()
 
