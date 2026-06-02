@@ -61,8 +61,9 @@ class Quiz(db.Model):
     theme_color = db.Column(db.String(7), default='#808080')
     text_color = db.Column(db.String(7), default='#FFFFFF')
     button_color = db.Column(db.String(7), default='#A0A0A0')
-    button_hover_color = db.Column(db.String(7), default='#C0C0C0')  # Новое поле
+    button_hover_color = db.Column(db.String(7), default='#C0C0C0')
     time_limit = db.Column(db.Integer, default=30)
+    timer_enabled = db.Column(db.Boolean, default=True)  # Новое поле
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     likes = db.Column(db.Integer, default=0)
@@ -70,7 +71,6 @@ class Quiz(db.Model):
 
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
     plays = db.relationship('QuizPlay', backref='quiz', lazy=True, cascade='all, delete-orphan')
-
 
 class Question(db.Model):
     __tablename__ = 'question'
@@ -226,14 +226,11 @@ def create_quiz():
         theme_color = request.form.get('theme_color', '#808080')
         text_color = request.form.get('text_color', '#FFFFFF')
         button_color = request.form.get('button_color', '#A0A0A0')
+        button_hover_color = request.form.get('button_hover_color', '#C0C0C0')
         time_limit = int(request.form.get('time_limit', 30))
+        timer_enabled = request.form.get('timer_enabled') == 'true'  # Новое поле
 
-        if time_limit < 5 or time_limit > 3600:
-            flash('Время должно быть от 5 секунд до 3600 секунд', 'error')
-            return render_template('create_quiz.html')
-
-        quiz_id = generate_id()
-        quiz_code = generate_code()
+        # ... остальной код ...
 
         quiz = Quiz(
             id=quiz_id,
@@ -242,7 +239,9 @@ def create_quiz():
             theme_color=theme_color,
             text_color=text_color,
             button_color=button_color,
+            button_hover_color=button_hover_color,
             time_limit=time_limit,
+            timer_enabled=timer_enabled,  # Добавить
             user_id=current_user.id
         )
 

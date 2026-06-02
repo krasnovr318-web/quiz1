@@ -23,9 +23,21 @@
         background: {{ quiz.button_color }} !important;
     }
 
-    .timer-circle {
-        border: 2px solid {{ quiz.button_color }};
+    /* Круговой таймер */
+    .progress-ring__circle {
+        stroke: {{ quiz.button_color }};
+    }
+
+    .timer-text {
         color: {{ quiz.text_color }};
+    }
+
+    .timer-container.warning .timer-text {
+        color: #ef5350;
+    }
+
+    .timer-container.warning .progress-ring__circle {
+        stroke: #ef5350;
     }
 
     /* Декоративные элементы */
@@ -46,7 +58,7 @@
         background-image: radial-gradient({{ quiz.text_color }} 2px, transparent 2px);
     }
 
-    /* Кнопки ответов - обычное состояние */
+    /* Кнопки ответов */
     .answer-btn {
         border: 2px solid {{ quiz.button_color }};
         background: {{ quiz.button_color }};
@@ -58,7 +70,6 @@
         color: {{ quiz.button_color }};
     }
 
-    /* Эффект при наведении - используем button_hover_color */
     .answer-btn:hover {
         background: {{ quiz.button_hover_color }};
         border-color: {{ quiz.button_hover_color }};
@@ -70,7 +81,6 @@
         color: {{ quiz.button_hover_color }};
     }
 
-    /* Выбранная кнопка */
     .answer-btn.selected {
         background: {{ quiz.button_color }};
         border-color: {{ quiz.button_color }};
@@ -82,7 +92,6 @@
         color: {{ quiz.button_color }};
     }
 
-    /* Правильный ответ (зеленый) */
     .answer-btn.correct {
         background: #00b894 !important;
         border-color: #00b894 !important;
@@ -94,7 +103,6 @@
         color: #00b894 !important;
     }
 
-    /* Неправильный ответ (красный) */
     .answer-btn.wrong {
         background: #d63031 !important;
         border-color: #d63031 !important;
@@ -106,7 +114,6 @@
         color: #d63031 !important;
     }
 
-    /* Статистика */
     .stat-card {
         border: 2px solid {{ quiz.button_color }};
         background: rgba(255, 255, 255, 0.1);
@@ -120,7 +127,6 @@
         color: {{ quiz.text_color }};
     }
 
-    /* Кнопки лайка и дизлайка */
     .btn-primary {
         background: {{ quiz.button_color }} !important;
         border: none !important;
@@ -145,7 +151,6 @@
     }
 </style>
 
-<!-- Остальной HTML без изменений -->
 <div class="quiz-container p-4 p-md-5 position-relative" id="quizApp">
     <div class="decorative-dots"></div>
     <div class="decorative-dots-right"></div>
@@ -156,9 +161,21 @@
             <div class="progress-bar" id="progressBar" style="width: 0%"></div>
         </div>
         <p class="mb-2 text-muted">Вопрос <span id="currentQuestionNum">1</span> из <span id="totalQuestions">{{ questions|length }}</span></p>
-        <div class="timer-circle mx-auto mb-3">
-            <span id="timer">{{ quiz.time_limit }}</span>
+
+        <!-- Круговой таймер -->
+        {% if quiz.timer_enabled %}
+        <div class="timer-container" id="timerContainer">
+            <svg class="progress-ring" width="100" height="100">
+                <circle class="progress-ring__circle-bg" r="42" cx="50" cy="50" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+                <circle class="progress-ring__circle" r="42" cx="50" cy="50" fill="transparent" stroke-width="6" stroke-dasharray="263.89" stroke-dashoffset="0"/>
+            </svg>
+            <div class="timer-text" id="timer">{{ quiz.time_limit }}</div>
         </div>
+        {% else %}
+        <div class="mb-3">
+            <div class="text-muted">⏱️ Таймер отключен</div>
+        </div>
+        {% endif %}
     </div>
 
     <div id="questionsContainer">
@@ -206,36 +223,89 @@
 </div>
 
 <script>
-// ... скрипт без изменений ...
 let currentQuestion = 0;
 let score = 0;
 let timeLeft = {{ quiz.time_limit }};
 let timerInterval;
+let animationFrame;
 const totalQuestions = {{ questions|length }};
 let answered = false;
 let quizId = '{{ quiz.id }}';
+let timerEnabled = {{ 'true' if quiz.timer_enabled else 'false' }};
+
+const radius = 42;
+const circumference = 2 * Math.PI * radius;
+
+function initTimer() {
+    if (!timerEnabled) return;
+
+    const circle = document.querySelector('.progress-ring__circle');
+    if (circle) {
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = `${circumference}`;
+    }
+    updateTimerProgress();
+}
+
+function updateTimerProgress() {
+    if (!timerEnabled) return;
+
+    const percent = timeLeft / {{ quiz.time_limit }};
+    const offset = circumference * (1 - percent);
+    const circle = document.querySelector('.progress-ring__circle');
+    if (circle) {
+        circle.style.strokeDashoffset = offset;
+    }
+
+    // Предупреждение при 5 секундах
+    const timerContainer = document.getElementById('timerContainer');
+    if (timeLeft <= 5 && timerContainer) {
+        timerContainer.classList.add('warning');
+    } else if (timerContainer) {
+        timerContainer.classList.remove('warning');
+    }
+}
 
 function startTimer() {
+    if (!timerEnabled) return;
+
     timeLeft = {{ quiz.time_limit }};
-    updateTimer();
+    updateTimerDisplay();
+    updateTimerProgress();
+
     timerInterval = setInterval(() => {
-        timeLeft--;
-        updateTimer();
-        if (timeLeft <= 0 && !answered && currentQuestion < totalQuestions) {
-            clearInterval(timerInterval);
-            nextQuestion();
+        if (!answered && timeLeft > 0) {
+            timeLeft--;
+            updateTimerDisplay();
+            updateTimerProgress();
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                if (!answered && currentQuestion < totalQuestions) {
+                    nextQuestion();
+                }
+            }
         }
     }, 1000);
 }
 
-function updateTimer() {
-    document.getElementById('timer').textContent = timeLeft;
+function updateTimerDisplay() {
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.textContent = timeLeft;
+    }
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
 }
 
 function selectAnswer(answerIndex, correctAnswer, button) {
     if (answered) return;
     answered = true;
-    clearInterval(timerInterval);
+    stopTimer();
 
     const allButtons = document.querySelectorAll('.answer-btn');
     allButtons.forEach(btn => {
@@ -276,7 +346,13 @@ function nextQuestion() {
             nextQuestionElement.style.display = 'block';
         }
         answered = false;
-        startTimer();
+
+        if (timerEnabled) {
+            timeLeft = {{ quiz.time_limit }};
+            updateTimerDisplay();
+            updateTimerProgress();
+            startTimer();
+        }
     } else {
         showResults();
     }
@@ -317,6 +393,10 @@ function dislikeQuiz() {
         });
 }
 
-startTimer();
+// Инициализация
+if (timerEnabled) {
+    initTimer();
+    startTimer();
+}
 </script>
 {% endblock %}

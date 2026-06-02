@@ -613,3 +613,54 @@ main {
         right: 3px;
     }
 }
+/* Круговой таймер */
+.timer-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 0.1s linear;
+    stroke-linecap: round;
+}
+
+.timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Анимация для таймера */
+@keyframes timer-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.timer-container.warning {
+    animation: timer-pulse 1s ease-in-out infinite;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .timer-container {
+        width: 70px;
+        height: 70px;
+    }
+
+    .timer-text {
+        font-size: 18px;
+    }
+}

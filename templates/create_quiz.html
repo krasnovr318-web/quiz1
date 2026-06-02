@@ -36,9 +36,21 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="time_limit" class="form-label">Время на ответ (секунды, от 5 до 3600)</label>
-                        <input type="number" class="form-control" id="time_limit" name="time_limit" value="30" min="5" max="3600" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="time_limit" class="form-label">Время на ответ (секунды, от 5 до 3600)</label>
+                            <input type="number" class="form-control" id="time_limit" name="time_limit" value="30" min="5" max="3600" required>
+                            <div class="form-text">Время на каждый вопрос</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" class="form-check-input" id="timer_enabled" name="timer_enabled" value="true" checked>
+                                <label class="form-check-label" for="timer_enabled">
+                                    ⏱️ Включить таймер
+                                </label>
+                                <div class="form-text">Если отключить, времени на ответ не будет</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
