@@ -3,92 +3,13 @@
 {% block title %}Викторина: {{ quiz.title }}{% endblock %}
 
 {% block content %}
-<style>
-    .quiz-container {
-        background: #ffffff;
-        border-radius: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        border: 1px solid #e0ddd5;
-    }
-
-    .answer-btn {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 16px 20px;
-        margin: 8px 0;
-        border-radius: 12px;
-        border: 1px solid #e0ddd5;
-        background: #ffffff;
-        color: #555;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-align: left;
-    }
-
-    .answer-btn:hover {
-        background: #faf9f7;
-        border-color: #c4a882;
-        transform: translateX(4px);
-    }
-
-    .answer-btn.selected {
-        background: #8b7355;
-        border-color: #8b7355;
-        color: white;
-    }
-
-    .answer-btn.correct {
-        background: #9b8c7c;
-        border-color: #9b8c7c;
-        color: white;
-    }
-
-    .answer-btn.wrong {
-        background: #c9a58b;
-        border-color: #c9a58b;
-        color: white;
-    }
-
-    .answer-btn::after {
-        content: "🔍";
-        font-size: 18px;
-        opacity: 0.5;
-        transition: opacity 0.3s;
-    }
-
-    .answer-btn:hover::after {
-        opacity: 1;
-    }
-
-    .answer-btn.selected::after,
-    .answer-btn.correct::after {
-        content: "✓";
-        opacity: 1;
-    }
-
-    .answer-btn.wrong::after {
-        content: "✗";
-        opacity: 1;
-    }
-
-    @media (max-width: 768px) {
-        .answer-btn::after {
-            content: "🔍";
-            font-size: 14px;
-        }
-    }
-</style>
-
 <div class="quiz-container p-4 p-md-5" id="quizApp">
     <div class="text-center mb-4">
-        <h2 class="mb-3" style="color: #8b7355;">{{ quiz.title }}</h2>
+        <h2 class="mb-3">{{ quiz.title }}</h2>
         <div class="progress mb-3">
             <div class="progress-bar" id="progressBar" style="width: 0%"></div>
         </div>
-        <p class="mb-2" style="color: #888;">Вопрос <span id="currentQuestionNum">1</span> из <span id="totalQuestions">{{ questions|length }}</span></p>
+        <p class="mb-2 text-muted">Вопрос <span id="currentQuestionNum">1</span> из <span id="totalQuestions">{{ questions|length }}</span></p>
         <div class="timer-circle mx-auto mb-3">
             <span id="timer">{{ quiz.time_limit }}</span>
         </div>
@@ -97,15 +18,20 @@
     <div id="questionsContainer">
         {% for question in questions %}
             <div class="question-slide" id="question_{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
-                <h3 class="text-center mb-4" style="color: #555;">{{ question.question_text }}</h3>
+                <h3 class="text-center mb-4">{{ question.question_text }}</h3>
                 <div class="row justify-content-center">
                     <div class="col-12">
                         {% for answer in question.parsed_answers %}
-                            <button class="answer-btn"
-                                    onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
-                                    data-answer="{{ loop.index0 }}">
-                                {{ answer }}
-                            </button>
+                            <div class="answer-wrapper">
+                                <button class="answer-btn"
+                                        onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
+                                        data-answer="{{ loop.index0 }}">
+                                    {{ answer }}
+                                </button>
+                                <button class="magnify-btn" onclick="magnifyText(this, '{{ answer|replace("'", "\\'")|safe }}')">
+                                    🔍
+                                </button>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -115,14 +41,14 @@
 
     <div id="resultsContainer" style="display: none;">
         <div class="text-center">
-            <h2 class="mb-4" style="color: #8b7355;">🎉 Викторина завершена!</h2>
+            <h2 class="mb-4">🎉 Викторина завершена!</h2>
             <div class="stat-card mb-4">
                 <div class="stat-number" id="finalScore">0/{{ questions|length }}</div>
                 <div class="stat-label">Правильных ответов</div>
             </div>
             <div class="row mb-4">
                 <div class="col-6">
-                    <button class="btn btn-dark w-100" onclick="likeQuiz()">
+                    <button class="btn btn-primary w-100" onclick="likeQuiz()">
                         👍 <span id="likesCount">{{ quiz.likes }}</span>
                     </button>
                 </div>
@@ -170,8 +96,11 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     answered = true;
     clearInterval(timerInterval);
 
-    const allButtons = button.parentElement.querySelectorAll('.answer-btn');
-    allButtons.forEach(btn => {
+    const wrapper = button.parentElement;
+    const allWrappers = wrapper.parentElement.querySelectorAll('.answer-wrapper');
+
+    allWrappers.forEach(w => {
+        const btn = w.querySelector('.answer-btn');
         btn.style.pointerEvents = 'none';
         const btnAnswer = parseInt(btn.dataset.answer);
         if (btnAnswer === correctAnswer) {
@@ -189,6 +118,22 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     setTimeout(() => {
         nextQuestion();
     }, 1500);
+}
+
+function magnifyText(button, text) {
+    // Анимация кнопки
+    button.classList.add('animate');
+
+    // Создаем всплывающую подсказку
+    const tooltip = document.createElement('div');
+    tooltip.className = 'magnify-tooltip';
+    tooltip.textContent = text;
+    document.body.appendChild(tooltip);
+
+    setTimeout(() => {
+        tooltip.remove();
+        button.classList.remove('animate');
+    }, 2000);
 }
 
 function nextQuestion() {
