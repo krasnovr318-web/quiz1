@@ -3,7 +3,11 @@
 {% block title %}Викторина: {{ quiz.title }}{% endblock %}
 
 {% block content %}
-<div class="quiz-container p-4 p-md-5" id="quizApp">
+<div class="quiz-container p-4 p-md-5 position-relative" id="quizApp">
+    <!-- Декоративные элементы -->
+    <div class="decorative-dots"></div>
+    <div class="decorative-dots-right"></div>
+
     <div class="text-center mb-4">
         <h2 class="mb-3">{{ quiz.title }}</h2>
         <div class="progress mb-3">
@@ -19,16 +23,15 @@
         {% for question in questions %}
             <div class="question-slide" id="question_{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
                 <h3 class="text-center mb-4">{{ question.question_text }}</h3>
-                <div class="row justify-content-center">
-                    <div class="col-12">
-                        {% for answer in question.parsed_answers %}
-                            <button class="answer-btn w-100 mb-2"
-                                    onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
-                                    data-answer="{{ loop.index0 }}">
-                                {{ answer }}
-                            </button>
-                        {% endfor %}
-                    </div>
+                <div class="answers-grid">
+                    {% for answer in question.parsed_answers %}
+                        <button class="answer-btn"
+                                onclick="selectAnswer({{ loop.index0 }}, {{ question.correct_answer }}, this)"
+                                data-answer="{{ loop.index0 }}">
+                            <span class="answer-letter">{{ ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К'][loop.index0] }}</span>
+                            <span class="answer-text">{{ answer }}</span>
+                        </button>
+                    {% endfor %}
                 </div>
             </div>
         {% endfor %}
@@ -58,12 +61,6 @@
             </a>
         </div>
     </div>
-</div>
-
-<!-- Декоративная крутящаяся лупа -->
-<div class="decorative-magnifier">
-    <div class="magnifier-glass">🔍</div>
-    <div class="magnifier-handle"></div>
 </div>
 
 <script>
@@ -97,7 +94,7 @@ function selectAnswer(answerIndex, correctAnswer, button) {
     answered = true;
     clearInterval(timerInterval);
 
-    const allButtons = button.parentElement.querySelectorAll('.answer-btn');
+    const allButtons = document.querySelectorAll('.answer-btn');
     allButtons.forEach(btn => {
         btn.style.pointerEvents = 'none';
         const btnAnswer = parseInt(btn.dataset.answer);

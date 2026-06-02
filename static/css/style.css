@@ -633,3 +633,181 @@ main {
         right: 3px;
     }
 }
+/* Декоративный фон для викторины */
+.quiz-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-container::before {
+    content: "?";
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 180px;
+    font-weight: bold;
+    color: rgba(76, 175, 80, 0.04);
+    pointer-events: none;
+    font-family: monospace;
+}
+
+.quiz-container::after {
+    content: "✨";
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 60px;
+    opacity: 0.06;
+    pointer-events: none;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Дополнительные декоративные точки */
+.decorative-dots {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 100px;
+    height: 200px;
+    background-image: radial-gradient(#4caf50 2px, transparent 2px);
+    background-size: 20px 20px;
+    opacity: 0.05;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.decorative-dots-right {
+    position: absolute;
+    bottom: 40px;
+    right: 10px;
+    width: 150px;
+    height: 150px;
+    background-image: radial-gradient(#4caf50 2px, transparent 2px);
+    background-size: 25px 25px;
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+/* Ответы с буквами/иконками */
+.answer-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: 1px solid #c8e6c9;
+    background: #ffffff;
+    color: #555555;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+    width: 100%;
+}
+
+.answer-letter {
+    width: 32px;
+    height: 32px;
+    background: #f1f8e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #4caf50;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.answer-btn:hover {
+    background: #f1f8e9;
+    border-color: #4caf50;
+    transform: translateX(4px);
+}
+
+.answer-btn:hover .answer-letter {
+    background: #4caf50;
+    color: white;
+}
+
+.answer-btn.selected {
+    background: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.answer-btn.selected .answer-letter {
+    background: white;
+    color: #4caf50;
+}
+
+.answer-btn.correct {
+    background: #66bb6a;
+    border-color: #66bb6a;
+    color: white;
+}
+
+.answer-btn.correct .answer-letter {
+    background: white;
+    color: #66bb6a;
+}
+
+.answer-btn.wrong {
+    background: #ef5350;
+    border-color: #ef5350;
+    color: white;
+}
+
+.answer-btn.wrong .answer-letter {
+    background: white;
+    color: #ef5350;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .quiz-container::before {
+        font-size: 100px;
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .quiz-container::after {
+        font-size: 40px;
+        top: 15px;
+        right: 15px;
+    }
+
+    .answer-letter {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .answer-btn {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+}
+
+/* Две колонки для ответов на ПК */
+@media (min-width: 769px) {
+    .answers-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .answer-btn {
+        margin: 0 !important;
+    }
+}
